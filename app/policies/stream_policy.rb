@@ -27,6 +27,10 @@ class StreamPolicy < ApplicationPolicy
     !record.deleted? && (record.user_id == user.id || user.admin?)
   end
 
+  def archive?
+    !record.archived? && !record.deleted? && (record.user_id == user.id || user.admin?)
+  end
+
   def notify?
     record.user_id == user.id && record.running?
   end

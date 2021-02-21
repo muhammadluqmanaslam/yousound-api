@@ -305,6 +305,7 @@ Rails.application.routes.draw do
 
       resources :streams do
         member do
+          post :archive
           get :notify
           get :start
           get :stop

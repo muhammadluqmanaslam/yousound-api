@@ -1,7 +1,7 @@
 module Api::V1
   class StreamsController < ApiController
     before_action :set_stream, only: [
-      :show, :update, :destroy, :notify,
+      :show, :update, :destroy, :archive, :notify,
       :start, :stop, :repost,
       :can_view, :pay_view, :view, :watching, :pay_attachment
     ]
@@ -31,7 +31,7 @@ module Api::V1
         )
         .where(
           streams: {
-            status: Stream.statuses[:running],
+            status: [Stream.statuses[:running], Stream.statuses[:archived]],
             notified: true
           }
         )
@@ -265,10 +265,31 @@ module Api::V1
 
 
     swagger_api :destroy do |api|
-      summary 'destroy a stream'
+      summary 'destroy asset from archived stream'
       param :path, :id, :string, :required, 'stream id'
     end
     def destroy
+      authorize @stream
+
+      begin
+        mux = Services::Mux.new
+        res = mux.deleteAsset(@stream.mp_channel_1_id)
+        @stream.update_attributes(
+          status: Stream.statuses[:deleted]
+        )
+      rescue => e
+        render_error e.message, :unprocessable_entity and return
+      end
+
+      render_success true
+    end
+
+
+    swagger_api :archive do |api|
+      summary 'archive a stream'
+      param :path, :id, :string, :required, 'stream id'
+    end
+    def archive
       authorize @stream
 
       result = @stream.remove

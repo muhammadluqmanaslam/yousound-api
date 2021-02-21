@@ -16,6 +16,7 @@ class Stream < ApplicationRecord
     starting: 'starting',
     running: 'running',
     inactive: 'inactive',
+    archived: 'archived',
     deleted: 'deleted'
   }
 
@@ -94,9 +95,10 @@ class Stream < ApplicationRecord
     remaining_seconds
   end
 
-  def run
+  def run(active_asset_id = nil)
     now = Time.now
     self.update_attributes(
+      mp_channel_1_id: active_asset_id,
       started_at: now,
       checkpoint_at: now,
       status: Stream.statuses[:running]
@@ -393,7 +395,7 @@ class Stream < ApplicationRecord
     Util::Tag.remove(@stream.id)
 
     begin
-      @stream.deleted!
+      @stream.status = Stream.statuses[:archived]
       mux = Services::Mux.new
       mux.completeStream(@stream.ml_channel_id)
       mux.deleteStream(@stream.ml_channel_id)

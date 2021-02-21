@@ -46,4 +46,11 @@ class Services::Mux
     }
     self.class.delete("/v1/live-streams/#{stream_id}", options)
   end
+
+  def deleteAsset(asset_id)
+    options = {
+      basic_auth: @auth
+    }
+    self.class.delete("/v1/assets/#{asset_id}", options)
+  end
 end

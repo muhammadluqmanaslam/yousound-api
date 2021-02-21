@@ -44,15 +44,16 @@ class WebController < ApplicationController
     type = request["type"]
     case type
       when 'video.live_stream.active'
-        channel_id = request["data"]["id"]
-        stream = Stream.find_by(ml_channel_id: channel_id)
+        live_stream_id = request['data']['id']
+        active_asset_id = request['data']['active_asset_id']
+        stream = Stream.find_by(ml_channel_id: live_stream_id)
         if stream && !(stream.inactive? || stream.deleted?)
-          stream.run
+          stream.run(active_asset_id)
           stream.notify
         end
       when 'video.live_stream.idle'
-        channel_id = request["data"]["id"]
-        stream = Stream.find_by(ml_channel_id: channel_id)
+        live_stream_id = request["data"]["id"]
+        stream = Stream.find_by(ml_channel_id: live_stream_id)
         if stream
           stream.remove
         end

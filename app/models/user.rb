@@ -80,7 +80,7 @@ class User < ApplicationRecord
   # main_genre
   belongs_to :genre
 
-  has_one :stream, -> { where.not status: Stream.statuses[:deleted] }
+  has_one :stream, -> { where.not status: [Stream.statuses[:archived], Stream.statuses[:deleted]] }
 
   has_many :devices
   has_many :user_albums
