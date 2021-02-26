@@ -271,17 +271,15 @@ module Api::V1
     def destroy
       authorize @stream
 
-      begin
-        mux = Services::Mux.new
-        res = mux.deleteAsset(@stream.mp_channel_1_id)
-        @stream.update_attributes(
-          status: Stream.statuses[:deleted]
-        )
-      rescue => e
-        render_error e.message, :unprocessable_entity and return
-      end
+      result = @stream.remove
+      render_error result, :unprocessable_entity and return unless result === true
 
-      render_success true
+      current_user.reload
+      render json: current_user,
+        serializer: UserSerializer,
+        scope: OpenStruct.new(current_user: current_user),
+        include_all: true,
+        include_social_info: true
     end
 
 
@@ -292,7 +290,7 @@ module Api::V1
     def archive
       authorize @stream
 
-      result = @stream.remove
+      result = @stream.remove(true)
       render_error result, :unprocessable_entity and return unless result === true
 
       # render json: @stream,
