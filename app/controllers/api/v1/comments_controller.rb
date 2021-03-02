@@ -79,7 +79,7 @@ module Api::V1
       summary 'update a comment'
       param_list :form, :status, :string, :required, 'Status', Comment.statuses
     end
-    def udpate
+    def update
       authorize @comment
       @comment.status = Comment.statuses[params[:status]]
       @comment.save

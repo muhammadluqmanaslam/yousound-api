@@ -401,6 +401,14 @@ class Stream < ApplicationRecord
 
       if need_archive
         @stream.status = Stream.statuses[:archived]
+
+        res = mux.getAsset(@stream.mp_channel_1_id)
+        playback1_id = res['data']['playback_ids'][0]['id'] rescue ''
+        playback2_id = res['data']['playback_ids'][1]['id'] rescue ''
+        @stream.mp_channel_1_ep_1_id = playback1_id
+        @stream.mp_channel_1_ep_1_url = playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8"
+        @stream.mp_channel_2_ep_1_id = playback2_id
+        @stream.mp_channel_2_ep_1_url = playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8"
       else
         @stream.status = Stream.statuses[:deleted]
 
