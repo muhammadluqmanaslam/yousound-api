@@ -2,6 +2,10 @@ require 'net/http/put/multipart'
 
 module Api::V1
   class VideosController < ApiController
+    before_action :set_stream, only: [
+      :update, :similars
+    ]
+
     skip_after_action :verify_authorized
     skip_after_action :verify_policy_scoped
 
@@ -199,6 +203,22 @@ module Api::V1
       end
 
       render_success StreamSerializer.new(@stream, scope: OpenStruct.new(current_user: current_user)).as_json
+    end
+
+    def similars
+      skip_authorization
+
+      count = param[:count].to_id rescue 4
+
+      streams = Stream.where(
+        status: Stream.statuses[:archived],
+        genre_id: @stream.genre_id
+      )
+
+      render_success ActiveModel::SerializableResource.new(
+        streams,
+        scope: OpenStruct.new(current_user: current_user)
+      )
     end
 
     private

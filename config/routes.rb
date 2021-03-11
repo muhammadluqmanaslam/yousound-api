@@ -315,11 +315,14 @@ Rails.application.routes.draw do
           get :view
           get :watching
           post :pay_attachment
-          get :similar_videos
         end
       end
 
-      resources :videos
+      resources :videos do
+        member do
+          get :similars
+        end
+      end
 
       namespace :shopping do
         resources :categories, only: [:index] do
