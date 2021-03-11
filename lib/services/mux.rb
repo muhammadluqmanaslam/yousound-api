@@ -19,8 +19,8 @@ class Services::Mux
     }
 
     options = {
-      body: body,
-      basic_auth: @auth
+      basic_auth: @auth,
+      body: body
     }
 
     self.class.post('/v1/live-streams', options)
@@ -59,5 +59,26 @@ class Services::Mux
       basic_auth: @auth
     }
     self.class.delete("/v1/assets/#{asset_id}", options)
+  end
+
+  def createUploadUrl()
+    body = {
+      "new_asset_settings": {
+        "playback_policy": ["public"]
+      },
+      "mp4_support": "standard"
+    }
+    options = {
+      basic_auth: @auth,
+      body: body
+    }
+    self.class.post("/v1/uploads", options)
+  end
+
+  def getUploadInfo(upload_id)
+    options = {
+      basic_auth: @auth
+    }
+    self.class.get("/v1/assets/#{upload_id}", options)
   end
 end

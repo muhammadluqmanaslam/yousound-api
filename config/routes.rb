@@ -319,6 +319,8 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :videos
+
       namespace :shopping do
         resources :categories, only: [:index] do
         end
