@@ -1,5 +1,3 @@
-require 'net/http/put/multipart'
-
 module Api::V1
   class VideosController < ApiController
     before_action :set_stream, only: [
@@ -43,8 +41,8 @@ module Api::V1
         #     http.request(req)
         #   end
         # end
-        req = Net::HTTP::Put::Multipart.new url.path,
-          "file" => UploadIO.new(
+        req = Net::HTTP::Put.new url.path,
+          UploadIO.new(
             params[:stream][:video].tempfile,
             params[:stream][:video].content_type,
             params[:stream][:video].original_filename
