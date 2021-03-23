@@ -173,7 +173,7 @@ module Api::V1
       count = param[:count].to_id rescue 4
 
       streams = Stream.where(
-        status: [ Stream.statuses[:running], Stream.statuses[:archived] ]
+        status: [ Stream.statuses[:running], Stream.statuses[:archived] ],
         genre_id: @stream.genre_id
       )
 
