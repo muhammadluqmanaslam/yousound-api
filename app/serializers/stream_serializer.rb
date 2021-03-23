@@ -1,5 +1,6 @@
 class StreamSerializer < ActiveModel::Serializer
-  attributes :id, :name, :description, :cover, :started_at, :stopped_at, :status, :mp_channel_1_ep_1_url,
+  attributes :id, :name, :slug, :description, :cover,
+    :video_type, :status, :started_at, :stopped_at, :mp_channel_1_ep_1_url, :duration,
     :valid_period, :remaining_seconds, :assoc_type, :account_ids, :digital_content_name,
     :view_price, :viewers_limit, :notified
   attribute :assoc

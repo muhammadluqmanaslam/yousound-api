@@ -20,8 +20,19 @@ class Stream < ApplicationRecord
     deleted: 'deleted'
   }
 
+  enum video_type: {
+    live: 'live',
+    uploaded: 'uploaded'
+  }
+
   mount_uploader :cover, VideoCoverUploader
   mount_uploader :digital_content, FileUploader
+
+  extend FriendlyId
+  friendly_id :slug_candidates, use: :slugged
+  def slug_candidates
+    [ :name ]
+  end
 
   belongs_to :user
   belongs_to :assoc, polymorphic: true, optional: true
@@ -396,20 +407,27 @@ class Stream < ApplicationRecord
 
     begin
       mux = Services::Mux.new
-      mux.completeStream(@stream.ml_channel_id)
-      mux.deleteStream(@stream.ml_channel_id)
 
-      if need_archive
-        @stream.status = Stream.statuses[:archived]
+      if @stream.running?
+        mux.completeStream(@stream.ml_channel_id)
+        mux.deleteStream(@stream.ml_channel_id)
 
-        res = mux.getAsset(@stream.mp_channel_1_id)
-        playback1_id = res['data']['playback_ids'][0]['id'] rescue ''
-        playback2_id = res['data']['playback_ids'][1]['id'] rescue ''
-        @stream.mp_channel_1_ep_1_id = playback1_id
-        @stream.mp_channel_1_ep_1_url = playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8"
-        @stream.mp_channel_2_ep_1_id = playback2_id
-        @stream.mp_channel_2_ep_1_url = playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8"
-      else
+        if need_archive
+          @stream.status = Stream.statuses[:archived]
+
+          res = mux.getAsset(@stream.mp_channel_1_id)
+          playback1_id = res['data']['playback_ids'][0]['id'] rescue ''
+          playback2_id = res['data']['playback_ids'][1]['id'] rescue ''
+          @stream.mp_channel_1_ep_1_id = playback1_id
+          @stream.mp_channel_1_ep_1_url = playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8"
+          @stream.mp_channel_2_ep_1_id = playback2_id
+          @stream.mp_channel_2_ep_1_url = playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8"
+        else
+          @stream.status = Stream.statuses[:deleted]
+
+          mux.deleteAsset(@stream.mp_channel_1_id)
+        end
+      elsif @stream.archived?
         @stream.status = Stream.statuses[:deleted]
 
         mux.deleteAsset(@stream.mp_channel_1_id)
@@ -420,6 +438,7 @@ class Stream < ApplicationRecord
     ensure
       @stream.started_at ||= now
       @stream.stopped_at ||= now
+
       if was_running
         played_time = (@stream.stopped_at - @stream.started_at).to_i rescue 0
 
