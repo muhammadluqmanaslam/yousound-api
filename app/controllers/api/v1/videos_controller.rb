@@ -37,6 +37,7 @@ module Api::V1
       creator_recoup_cost = params[:stream][:creator_recoup_cost].to_i rescue 0
       account_ids = params[:stream][:account_ids].split(',').map{|v| v.strip.to_i} rescue []
       duration = params[:stream][:duration].to_id rescue 0
+      upload_url = ''
 
       render_error 'Required duration', :unprocessable_entity and return unless duration > 0
 
@@ -46,9 +47,9 @@ module Api::V1
         Rails.logger.info('*** *** ***')
         Rails.logger.info(res)
 
-        req_url = res['data']['url']
+        upload_url = res['data']['url']
         upload_id = res['data']['id']
-        url = URI.parse(req_url)
+        # url = URI.parse(upload_url)
         # File.open(params[:stream][:video].path) do |file|
         #   req = Net::HTTP::Put::Multipart.new url.path,
         #     "file" => UploadIO.new(params[:stream][:video].tempfile, model_params[:avatar].content_type, model_params[:avatar].original_filename)
@@ -56,25 +57,24 @@ module Api::V1
         #     http.request(req)
         #   end
         # end
-        req = Net::HTTP::Put.new url.path,
-          UploadIO.new(
-            params[:stream][:video].tempfile,
-            params[:stream][:video].content_type,
-            params[:stream][:video].original_filename
-          )
-        res = Net::HTTP.start(url.host, url.port, url_ssl: true) do |http|
-          http.request(req)
-        end
-        Rails.logger.info('+++ +++ +++')
-        Rails.logger.info(res)
 
-        res = mux.getUploadInfo(upload_id)
-        Rails.logger.info('--- --- ---')
-        Rails.logger.info(res)
-
-        res = mux.getAsset(res['data']['asset_id'])
-        Rails.logger.info('=== === ===')
-        Rails.logger.info(res)
+        # req = Net::HTTP::Put.new url.path,
+        #   UploadIO.new(
+        #     params[:stream][:video].tempfile,
+        #     params[:stream][:video].content_type,
+        #     params[:stream][:video].original_filename
+        #   )
+        # res = Net::HTTP.start(url.host, url.port, url_ssl: true) do |http|
+        #   http.request(req)
+        # end
+        # Rails.logger.info('+++ +++ +++')
+        # Rails.logger.info(res)
+        # res = mux.getUploadInfo(upload_id)
+        # Rails.logger.info('--- --- ---')
+        # Rails.logger.info(res)
+        # res = mux.getAsset(res['data']['asset_id'])
+        # Rails.logger.info('=== === ===')
+        # Rails.logger.info(res)
 
         playback1_id = res['data']['playback_ids'][0]['id'] rescue ''
         playback2_id = res['data']['playback_ids'][1]['id'] rescue ''
@@ -93,13 +93,15 @@ module Api::V1
           mp_channel_1_ep_1_url: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8",
           mp_channel_2_ep_1_id: playback2_id,
           mp_channel_2_ep_1_url: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8",
+          mp_channel_2_id: upload_id,
+          mp_channel_2_url: upload_url,
           cf_domain: nil,
           account_ids: account_ids,
           remaining_seconds: -1,
           digital_content: params[:stream][:digital_content],
           digital_content_name: params[:stream][:digital_content_name],
           duration: duration,
-          status: Stream.statuses[:archived]
+          status: Stream.statuses[:uploading]
         )
         if params[:stream][:assoc_type].present? && params[:stream][:assoc_id].present?
           @stream.assoc_id = params[:stream][:assoc_id]
@@ -153,9 +155,12 @@ module Api::V1
         render_error e.message, :unprocessable_entity and return
       end
 
-      render json: @stream,
-        serializer: StreamSerializer,
-        scope: OpenStruct.new(current_user: current_user)
+      # render json: @stream,
+      #   serializer: StreamSerializer,
+      #   scope: OpenStruct.new(current_user: current_user)
+      redner json: {
+        url: upload_url
+      }
     end
 
     ## use "PATCH streams/:id"

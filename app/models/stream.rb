@@ -14,8 +14,10 @@ class Stream < ApplicationRecord
   enum status: {
     active: 'active',
     starting: 'starting',
-    running: 'running',
     inactive: 'inactive',
+
+    uploading: 'uploading',
+    running: 'running',
     archived: 'archived',
     deleted: 'deleted'
   }

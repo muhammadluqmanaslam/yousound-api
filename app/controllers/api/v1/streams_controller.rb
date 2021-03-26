@@ -3,7 +3,8 @@ module Api::V1
     before_action :set_stream, only: [
       :show, :update, :destroy, :archive, :notify,
       :start, :stop, :repost,
-      :can_view, :pay_view, :view, :watching, :pay_attachment
+      :can_view, :pay_view, :view, :watching, :pay_attachment,
+      :similars
     ]
     # skip_after_action :verify_authorized
     # skip_after_action :verify_policy_scoped
@@ -490,6 +491,24 @@ module Api::V1
       Util::Message.send(@stream.user, current_user, message_body)
 
       render_success true
+    end
+
+
+    def similars
+      skip_authorization
+
+      count = param[:count].to_id rescue 4
+
+      streams = Stream.where(
+        status: [ Stream.statuses[:running], Stream.statuses[:archived] ],
+        genre_id: @stream.genre_id
+      )
+
+      render_success ActiveModel::SerializableResource.new(
+        streams,
+        each_serializer: StreamSerializer,
+        scope: OpenStruct.new(current_user: current_user)
+      )
     end
 
     private

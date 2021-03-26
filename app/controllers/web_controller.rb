@@ -52,11 +52,14 @@ class WebController < ApplicationController
           stream.notify
         end
       when 'video.live_stream.idle'
-        live_stream_id = request["data"]["id"]
+        live_stream_id = request['data']['id']
         stream = Stream.find_by(ml_channel_id: live_stream_id)
         if stream
           stream.remove
         end
+      when 'video.upload.asset_created'
+        upload_id = request['object']['id']
+        asset_id = request['data']['id']
     end
   end
 

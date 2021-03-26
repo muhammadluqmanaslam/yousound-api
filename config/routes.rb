@@ -315,6 +315,7 @@ Rails.application.routes.draw do
           get :view
           get :watching
           post :pay_attachment
+          get :similars
         end
       end
 
