@@ -410,7 +410,11 @@ class Stream < ApplicationRecord
     begin
       mux = Services::Mux.new
 
-      if @stream.running?
+      if @stream.archived?
+        @stream.status = Stream.statuses[:deleted]
+
+        mux.deleteAsset(@stream.mp_channel_1_id)
+      else
         mux.completeStream(@stream.ml_channel_id)
         mux.deleteStream(@stream.ml_channel_id)
 
@@ -429,10 +433,6 @@ class Stream < ApplicationRecord
 
           mux.deleteAsset(@stream.mp_channel_1_id)
         end
-      elsif @stream.archived?
-        @stream.status = Stream.statuses[:deleted]
-
-        mux.deleteAsset(@stream.mp_channel_1_id)
       end
     rescue => e
       Rails.logger.info(e.message)
