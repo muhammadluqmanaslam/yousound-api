@@ -63,6 +63,7 @@ class Services::Mux
 
   def createUploadUrl()
     body = {
+      "cors_origin": ENV['WEB_BASE_URL'],
       "new_asset_settings": {
         "playback_policy": ["public"]
       },
