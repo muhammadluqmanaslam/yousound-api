@@ -79,6 +79,7 @@ module Api::V1
         playback1_id = res['data']['playback_ids'][0]['id'] rescue ''
         playback2_id = res['data']['playback_ids'][1]['id'] rescue ''
         @stream.assign_attributes(
+          video_type: Stream.video_types[:uploaded],
           name: params[:stream][:name],
           description: params[:stream][:description] || '',
           genre_id: genre_id,
