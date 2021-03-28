@@ -22,9 +22,9 @@ module Api::V1
     end
 
     def create
-      unless params[:stream][:video].instance_of? ActionDispatch::Http::UploadedFile
-        render_error 'Please attach a video file', :unprocessable_entity and return
-      end
+      # unless params[:stream][:video].instance_of? ActionDispatch::Http::UploadedFile
+      #   render_error 'Please attach a video file', :unprocessable_entity and return
+      # end
 
       @stream = Stream.new(
         user: current_user,
