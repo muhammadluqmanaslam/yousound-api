@@ -72,9 +72,9 @@ class WebController < ApplicationController
         asset_id = request['data']['id']
         stream = Stream.find_by(mp_channel_1_id: asset_id)
 
-        if (stream && stream.uploading?) {
-          playback1_id = res['data']['playback_ids'][0]['id'] rescue ''
-          playback2_id = res['data']['playback_ids'][1]['id'] rescue ''
+        if (stream && stream.uploading?)
+          playback1_id = request['data']['playback_ids'][0]['id'] rescue ''
+          playback2_id = request['data']['playback_ids'][1]['id'] rescue ''
           stream.update_attributes(
             mp_channel_1_ep_1_id: playback1_id,
             mp_channel_1_ep_1_url: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8",
@@ -82,7 +82,7 @@ class WebController < ApplicationController
             mp_channel_2_ep_1_url: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8",
             status: Stream.statuses[:archived]
           )
-        }
+        end
     end
   end
 
