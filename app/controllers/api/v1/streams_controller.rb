@@ -498,12 +498,13 @@ module Api::V1
     def similars
       skip_authorization
 
-      count = param[:count].to_id rescue 4
+      page = (params[:page] || 1).to_i
+      per_page = (params[:per_page] || 10).to_i
 
       streams = Stream.where(
         status: [ Stream.statuses[:running], Stream.statuses[:archived] ],
         genre_id: @stream.genre_id
-      )
+      ).page(page).per(per_page)
 
       render_success ActiveModel::SerializableResource.new(
         streams,
