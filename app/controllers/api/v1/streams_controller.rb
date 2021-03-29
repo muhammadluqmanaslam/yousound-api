@@ -504,7 +504,7 @@ module Api::V1
       streams = Stream.where(
         status: [ Stream.statuses[:running], Stream.statuses[:archived] ],
         genre_id: @stream.genre_id
-      ).page(page).per(per_page)
+      ).where.not(id: @stream.id).page(page).per(per_page)
 
       render_success(
         streams: ActiveModel::SerializableResource.new(
