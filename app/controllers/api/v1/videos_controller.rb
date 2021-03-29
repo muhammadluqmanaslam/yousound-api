@@ -44,8 +44,8 @@ module Api::V1
       begin
         mux = Services::Mux.new
         res = mux.createUploadUrl
-        Rails.logger.info('*** *** ***')
-        Rails.logger.info(res)
+        # Rails.logger.info('*** *** ***')
+        # Rails.logger.info(res)
 
         upload_url = res['data']['url']
         upload_id = res['data']['id']
@@ -86,14 +86,8 @@ module Api::V1
           view_price: view_price,
           viewers_limit: viewers_limit,
           cover: params[:stream][:cover],
-          ml_channel_id: res['data']['id'],
-          ml_input_id: res['data']['stream_key'],
           ml_input_dest_1_url: 'rtmp://live.yousound.com:5222/app',
           ml_input_dest_2_url: 'rtmp://live.yousound.com:433/app',
-          mp_channel_1_ep_1_id: playback1_id,
-          mp_channel_1_ep_1_url: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8",
-          mp_channel_2_ep_1_id: playback2_id,
-          mp_channel_2_ep_1_url: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8",
           mp_channel_2_id: upload_id,
           mp_channel_2_url: upload_url,
           cf_domain: nil,
@@ -102,7 +96,7 @@ module Api::V1
           digital_content: params[:stream][:digital_content],
           digital_content_name: params[:stream][:digital_content_name],
           duration: duration,
-          status: Stream.statuses[:uploading]
+          status: Stream.statuses[:active]
         )
         if params[:stream][:assoc_type].present? && params[:stream][:assoc_id].present?
           @stream.assoc_id = params[:stream][:assoc_id]

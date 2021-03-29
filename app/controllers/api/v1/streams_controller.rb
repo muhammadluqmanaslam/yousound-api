@@ -382,7 +382,7 @@ module Api::V1
         })
         @stream.update_attributes(
           stopped_at: Time.now,
-          status: Stream.statuses[:active]
+          status: Stream.statuses[:inactive]
         )
       rescue => e
         render_error e.message, :unprocessable_entity and return
