@@ -506,10 +506,12 @@ module Api::V1
         genre_id: @stream.genre_id
       ).page(page).per(per_page)
 
-      render_success ActiveModel::SerializableResource.new(
-        streams,
-        each_serializer: StreamSerializer,
-        scope: OpenStruct.new(current_user: current_user)
+      render_success(
+        streams: ActiveModel::SerializableResource.new(
+          streams,
+          scope: OpenStruct.new(current_user: current_user)
+        ),
+        pagination: pagination(streams)
       )
     end
 
