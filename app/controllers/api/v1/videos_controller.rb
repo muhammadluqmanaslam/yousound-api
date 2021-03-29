@@ -36,7 +36,7 @@ module Api::V1
       viewers_limit = params[:stream][:viewers_limit].to_i rescue 0
       creator_recoup_cost = params[:stream][:creator_recoup_cost].to_i rescue 0
       account_ids = params[:stream][:account_ids].split(',').map{|v| v.strip.to_i} rescue []
-      duration = params[:stream][:duration].to_id rescue 0
+      duration = params[:stream][:duration].to_i rescue 0
       upload_url = ''
 
       render_error 'Required duration', :unprocessable_entity and return unless duration > 0
@@ -159,7 +159,7 @@ module Api::V1
       # render json: @stream,
       #   serializer: StreamSerializer,
       #   scope: OpenStruct.new(current_user: current_user)
-      redner json: {
+      render json: {
         url: upload_url
       }
     end
