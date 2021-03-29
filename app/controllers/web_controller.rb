@@ -82,6 +82,8 @@ class WebController < ApplicationController
             mp_channel_2_ep_1_url: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8",
             status: Stream.statuses[:archived]
           )
+
+          stream.notify
         end
     end
   end
