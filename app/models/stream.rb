@@ -144,7 +144,11 @@ class Stream < ApplicationRecord
   def notify
     self.update_columns(notified: true)
 
-    ActionCable.server.broadcast("stream_creator_#{self.id}", { notified: true })
+    if self.live?
+      ActionCable.server.broadcast("stream_creator_#{self.id}", { notified: true })
+    else
+      ActionCable.server.broadcast("stream_#{self.id}", { notified: true })
+    end
 
     if self.collaborators_count > 0
       creator_stream = self.user_streams.where(users_streams: {
