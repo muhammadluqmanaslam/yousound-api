@@ -150,12 +150,13 @@ module Api::V1
         render_error e.message, :unprocessable_entity and return
       end
 
-      # render json: @stream,
-      #   serializer: StreamSerializer,
-      #   scope: OpenStruct.new(current_user: current_user)
-      render json: {
-        url: upload_url
-      }
+      stream_json = StreamSerializer.new(
+        @stream,
+        scope: OpenStruct.new(current_user: current_user),
+      ).as_json
+      stream_json[:upload_url] = upload_url
+
+      render_success(stream_json)
     end
 
     ## use "PATCH streams/:id"
