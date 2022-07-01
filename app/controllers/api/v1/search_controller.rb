@@ -233,7 +233,7 @@ module Api::V1
         includes: [:merchant, :category, :variants, :shipments, :covers, :user_products],
         limit: limit
       )
-      streams = Stream.where(status: Stream.statuses[:running]).limit(limit)
+      streams = Stream.limit(limit)
       streams = streams.where('name ILIKE ?', "%#{q.downcase}%") if q.presence
 
       render_success(
