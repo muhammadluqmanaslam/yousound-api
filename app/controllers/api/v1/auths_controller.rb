@@ -137,7 +137,9 @@ module Api::V1
         user.attributes = permitted_attributes(user)
         validate_need = true
       end
-
+      if params[:request_role].present?
+        user.user_type = params[:request_role]
+      end
       unless user.request_role.blank?
         user.request_status = User.request_statuses[:pending]
       end
