@@ -47,7 +47,7 @@ module Api::V1
       param :form, :per_page, :integer, :optional, '12, 24, etc. default is 24'
     end
     def search_stream
-      filter = params[:filter] || 'show_all'
+      filter = params[:filter] || 'any'
       genre = params[:genre] || 'any'
       page = params[:page] || 1
       per_page = params[:per_page] || 24
