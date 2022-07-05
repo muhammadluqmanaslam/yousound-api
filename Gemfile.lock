@@ -687,6 +687,7 @@ GEM
     case_transform (0.2)
       activesupport
     cloudfront-signer (3.0.2)
+    coderay (1.1.3)
     concurrent-ruby (1.0.5)
     concurrent-ruby (1.0.5-java)
     connection_pool (2.2.2)
@@ -1001,6 +1002,13 @@ GEM
     pg (0.21.0)
     pg (0.21.0-x64-mingw32)
     pg (0.21.0-x86-mingw32)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
+    pry (0.12.2-java)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
+      spoon (~> 0.0)
     puma (3.11.4)
     puma (3.11.4-java)
     pundit (1.1.0)
@@ -1100,6 +1108,8 @@ GEM
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (~> 3.0)
+    spoon (0.0.6)
+      ffi
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-watcher-listen (2.0.1)
@@ -1201,6 +1211,7 @@ DEPENDENCIES
   openssl
   panko_serializer
   pg (~> 0.18)
+  pry
   puma (~> 3.7)
   pundit
   rack-attack

@@ -204,6 +204,9 @@ class User < ApplicationRecord
     hidden_product_ids = Feed.where(publisher_id: self.id, feed_type: Feed.feed_types[:hide], assoc_type: 'ShopProduct').pluck(:assoc_id)
     exclude_product_ids.concat hidden_product_ids
 
+    hidden_product_ids = ShopProduct.where(show_status: "show_only_stream").pluck(:id)
+    exclude_product_ids.concat hidden_product_ids
+
     exclude_product_ids
   end
 
