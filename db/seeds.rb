@@ -11,3 +11,4 @@
 # require_relative './seeds/genres.rb'
 require_relative './seeds/genres_tree.rb'
 require_relative './seeds/shop_categories.rb'
+require_relative './seeds/user_seed.rb'
