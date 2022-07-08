@@ -206,7 +206,8 @@ class User < ApplicationRecord
 
     hidden_product_ids = ShopProduct.where(show_status: "show_only_stream").pluck(:id)
     exclude_product_ids.concat hidden_product_ids
-
+    #is_only_for_live_stream
+    
     exclude_product_ids
   end
 
@@ -374,21 +375,22 @@ class User < ApplicationRecord
 
     user_blocked_product_ids = user&.blocked_product_ids || []
     user_blocked_album_ids = user&.blocked_album_ids || []
-
+   
+    user_s = self.id.present? ? self : user
     case filter
       when 'any'
         query = Feed
             .select('t1.*')
             .from('feeds t1')
             .joins("RIGHT JOIN (SELECT MAX(id) AS id, assoc_id, assoc_type FROM feeds "\
-                "WHERE publisher_id = '#{self.id}' "\
+                "WHERE publisher_id = '#{user_s.id}' "\
                 "GROUP BY assoc_id, assoc_type) t2 ON t1.id = t2.id")
             .joins("LEFT JOIN albums t3 ON t1.assoc_type = 'Album' AND t1.assoc_id = t3.id")
             .where(
               "t1.assoc_type = 'Stream' "\
               "OR (t1.assoc_type = 'ShopProduct' AND t1.assoc_id NOT IN(?)) "\
               "OR (t3.album_type = ? AND t1.assoc_id NOT IN (?))",
-              self.blocked_product_ids + user_blocked_product_ids, Album.album_types[:album], self.blocked_album_ids + user_blocked_album_ids)
+              user_s.blocked_product_ids + user_blocked_product_ids, Album.album_types[:album], user_s.blocked_album_ids + user_blocked_album_ids)
             .most_recent
             .limit(count)
       when 'uploaded'
@@ -396,10 +398,10 @@ class User < ApplicationRecord
             .select('t1.*')
             .from('feeds t1')
             .joins("RIGHT JOIN (SELECT MAX(feeds.id) AS id, assoc_id, assoc_type FROM feeds "\
-                "WHERE publisher_id = '#{self.id}' AND assoc_type = 'Album' "\
+                "WHERE publisher_id = '#{user_s.id}' AND assoc_type = 'Album' "\
                 "GROUP BY assoc_id, assoc_type) t2 ON t1.id = t2.id")
             .joins("LEFT JOIN albums t3 ON t1.assoc_id = t3.id")
-            .where('t3.album_type = ? AND t1.assoc_id NOT IN (?)', Album.album_types[:album], self.blocked_album_ids + user_blocked_album_ids)
+            .where('t3.album_type = ? AND t1.assoc_id NOT IN (?)', Album.album_types[:album], user_s.blocked_album_ids + user_blocked_album_ids)
             .most_recent
             .limit(count)
       when 'playlist'
@@ -407,10 +409,10 @@ class User < ApplicationRecord
             .select('t1.*')
             .from('feeds t1')
             .joins("RIGHT JOIN (SELECT MAX(feeds.id) AS id, assoc_id, assoc_type FROM feeds "\
-                "WHERE publisher_id = '#{self.id}' AND assoc_type='Album' "\
+                "WHERE publisher_id = '#{user_s.id}' AND assoc_type='Album' "\
                 "GROUP BY assoc_id, assoc_type) t2 ON t1.id = t2.id")
             .joins("LEFT JOIN albums t3 ON t1.assoc_id = t3.id")
-            .where('t3.album_type = ? AND t1.assoc_id NOT IN (?)', Album.album_types[:playlist], self.blocked_album_ids + user_blocked_album_ids)
+            .where('t3.album_type = ? AND t1.assoc_id NOT IN (?)', Album.album_types[:playlist], user_s.blocked_album_ids + user_blocked_album_ids)
             .most_recent
             .limit(count)
       when 'merch'
@@ -418,9 +420,9 @@ class User < ApplicationRecord
             .select('t1.*')
             .from('feeds t1')
             .joins("RIGHT JOIN (SELECT MAX(id) AS id, assoc_id, assoc_type FROM feeds "\
-                "WHERE publisher_id = '#{self.id}' AND assoc_type = 'ShopProduct' "\
+                "WHERE publisher_id = '#{user_s.id}' AND assoc_type = 'ShopProduct' "\
                 "GROUP BY assoc_id, assoc_type) t2 ON t1.id = t2.id")
-            .where("t1.assoc_type = 'ShopProduct' AND t1.assoc_id NOT IN (?)", self.blocked_product_ids + user_blocked_product_ids)
+            .where("t1.assoc_type = 'ShopProduct' AND t1.assoc_id NOT IN (?)", user_s.blocked_product_ids + user_blocked_product_ids)
             .most_recent
             .limit(count)
       when 'video'
@@ -428,7 +430,7 @@ class User < ApplicationRecord
             .select('t1.*')
             .from('feeds t1')
             .joins("RIGHT JOIN (SELECT MAX(id) AS id, assoc_id, assoc_type FROM feeds "\
-                "WHERE publisher_id = '#{self.id}' AND assoc_type = 'Stream' "\
+                "WHERE publisher_id = '#{user_s.id}' AND assoc_type = 'Stream' "\
                 "GROUP BY assoc_id, assoc_type) t2 ON t1.id = t2.id")
             .where('t1.assoc_type = ?', 'Stream')
             .most_recent
@@ -448,14 +450,14 @@ class User < ApplicationRecord
             .select('t1.*')
             .from('feeds t1')
             .joins("RIGHT JOIN (SELECT MAX(id) AS id, assoc_id, assoc_type FROM feeds "\
-                "WHERE publisher_id = '#{self.id}' AND feed_type = '#{feed_type}' "\
+                "WHERE publisher_id = '#{user_s.id}' AND feed_type = '#{feed_type}' "\
                 "GROUP BY assoc_id, assoc_type) t2 ON t1.id = t2.id")
             .joins("LEFT JOIN albums t3 ON t1.assoc_type = 'Album' AND t1.assoc_id = t3.id")
             .where(
               "t1.assoc_type = 'Stream' "\
               "OR (t1.assoc_type = 'ShopProduct' AND t1.assoc_id NOT IN(?)) "\
               "OR (t3.album_type = ? AND t1.assoc_id NOT IN (?))",
-              self.blocked_product_ids + user_blocked_product_ids, Album.album_types[:album], self.blocked_album_ids + user_blocked_album_ids)
+              user_s.blocked_product_ids + user_blocked_product_ids, Album.album_types[:album], user_s.blocked_album_ids + user_blocked_album_ids)
             .most_recent
             .limit(count)
     end
@@ -530,7 +532,7 @@ class User < ApplicationRecord
             .from('users t0')
             .joins("RIGHT JOIN (SELECT t1.publisher_id, MAX(t1.created_at) AS created_at FROM feeds t1 "\
                 "LEFT JOIN albums t3 ON t1.assoc_id = t3.id AND t1.assoc_type = 'Album' "\
-                "WHERE t1.consumer_id = '#{self.id}' AND t1.publisher_id NOT IN ('#{blocked_user_ids.join("', '")}') "\
+                "WHERE (t1.status != 'deleted' OR t1.status is null) AND t1.consumer_id = '#{self.id}' AND t1.publisher_id NOT IN ('#{blocked_user_ids.join("', '")}') "\
                   "AND (t1.assoc_type = 'Stream' "\
                     "OR (t1.assoc_type = 'ShopProduct' AND t1.assoc_id NOT IN('#{self.blocked_product_ids.join("', '")}')) "\
                     "OR (t3.album_type = '#{Album.album_types[:album].to_s}' AND t1.assoc_id NOT IN ('#{self.blocked_album_ids.join("', '")}'))) "\
@@ -542,7 +544,7 @@ class User < ApplicationRecord
             .from('users t0')
             .joins("RIGHT JOIN (SELECT t1.publisher_id, MAX(t1.created_at) AS created_at FROM feeds t1 "\
                 "LEFT JOIN albums t3 ON t1.assoc_id = t3.id AND t1.assoc_type = 'Album' "\
-                "WHERE t1.consumer_id = '#{self.id}' AND t1.publisher_id NOT IN ('#{blocked_user_ids.join("', '")}') "\
+                "WHERE (t1.status != 'deleted' OR t1.status is null) AND t1.consumer_id = '#{self.id}' AND t1.publisher_id NOT IN ('#{blocked_user_ids.join("', '")}') "\
                   "AND t3.album_type = '#{Album.album_types[:playlist].to_s}' AND t1.assoc_type = 'Album' AND t1.assoc_id NOT IN ('#{self.blocked_album_ids.join("', '")}') "\
                 "GROUP BY t1.publisher_id ORDER BY created_at) t2 ON t0.id = t2.publisher_id")
             .order('t2.created_at DESC')
@@ -551,7 +553,7 @@ class User < ApplicationRecord
             .select('t0.*')
             .from('users t0')
             .joins("RIGHT JOIN (SELECT t1.publisher_id, MAX(t1.created_at) AS created_at FROM feeds t1 "\
-                "WHERE t1.consumer_id = '#{self.id}' AND t1.publisher_id NOT IN ('#{blocked_user_ids.join("', '")}') "\
+                "WHERE (t1.status != 'deleted' OR t1.status is null) AND t1.consumer_id = '#{self.id}' AND t1.publisher_id NOT IN ('#{blocked_user_ids.join("', '")}') "\
                   "AND t1.assoc_type = 'ShopProduct' AND t1.assoc_id NOT IN('#{self.blocked_product_ids.join("', '")}') "\
                 "GROUP BY t1.publisher_id ORDER BY created_at) t2 ON t0.id = t2.publisher_id")
             .order('t2.created_at DESC')
@@ -560,7 +562,7 @@ class User < ApplicationRecord
             .select('t0.*')
             .from('users t0')
             .joins("RIGHT JOIN (SELECT t1.publisher_id, MAX(t1.created_at) AS created_at FROM feeds t1 "\
-                "WHERE t1.consumer_id = '#{self.id}' AND t1.publisher_id NOT IN ('#{blocked_user_ids.join("', '")}') "\
+                "WHERE (t1.status != 'deleted' OR t1.status is null) AND t1.consumer_id = '#{self.id}' AND t1.publisher_id NOT IN ('#{blocked_user_ids.join("', '")}') "\
                   "AND t1.assoc_type = 'Stream' "\
                 "GROUP BY t1.publisher_id ORDER BY created_at) t2 ON t0.id = t2.publisher_id")
             .order('t2.created_at DESC')
@@ -570,7 +572,7 @@ class User < ApplicationRecord
             .from('users t0')
             .joins("RIGHT JOIN (SELECT t1.publisher_id, MAX(t1.created_at) AS created_at FROM feeds t1 "\
                 "LEFT JOIN albums t3 ON t1.assoc_id = t3.id AND t1.assoc_type = 'Album' "\
-                "WHERE t1.consumer_id = '#{self.id}' AND t1.publisher_id NOT IN ('#{blocked_user_ids.join("', '")}') "\
+                "WHERE (t1.status != 'deleted' OR t1.status is null) AND t1.consumer_id = '#{self.id}' AND t1.publisher_id NOT IN ('#{blocked_user_ids.join("', '")}') "\
                   "AND (t3.album_type = '#{Album.album_types[:album].to_s}' AND t1.assoc_id NOT IN ('#{self.blocked_album_ids.join("', '")}')) "\
                   "AND t1.feed_type = '#{feed_type}' "\
                 "GROUP BY t1.publisher_id ORDER BY created_at) t2 ON t0.id = t2.publisher_id")
