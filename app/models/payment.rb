@@ -935,7 +935,7 @@ class Payment < ApplicationRecord
       fee_percent =
         case fee_type
           when 'shopping'
-            0.1
+            0
           when 'repost'
             if amount > 100
               0.1
@@ -945,9 +945,9 @@ class Payment < ApplicationRecord
           when 'donation'
             if fee_description == 'donation'
               # 0.02
-              0.1
+              0
             else
-              0.1
+              0
             end
           else
             0.1
