@@ -21,7 +21,7 @@ class ShopOrder < ApplicationRecord
   has_many :items, foreign_key: 'order_id', class_name: 'ShopItem', dependent: :destroy
   accepts_nested_attributes_for :items
 
-  default_scope { order(created_at: :desc) }
+  # default_scope { order(created_at: :desc) }
 
   scope :for_product, -> (product_id) {
     joins(:items => [:product]).where(shop_products: { id: product_id })

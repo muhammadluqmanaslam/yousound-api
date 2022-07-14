@@ -120,6 +120,7 @@ module Api::V1::Shopping
       order_ids = query.group(:order_id).pluck(:order_id)
 
       orders = ShopOrder.includes(:customer, :merchant, :items).where(id: order_ids)
+        .order(updated_at: params[:sort] || 'DESC')
         .page(params[:page] || 1)
         .per(params[:per_page] || 10)
 
