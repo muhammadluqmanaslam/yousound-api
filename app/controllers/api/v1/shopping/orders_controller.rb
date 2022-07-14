@@ -103,7 +103,7 @@ module Api::V1::Shopping
         when 'refunded'
           query = query.where(
             users_products: {
-              user_type: UserProduct.user_types[:collaborator]
+              user_type: UserProduct.user_types[:creator]
             },
             status: ShopItem.statuses[:refunded]
           )

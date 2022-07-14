@@ -8,7 +8,7 @@ class RefundOrderJob < ApplicationJob
         if order.items.present? 
           order.items.each do |item|
             if item.product.digital_content == nil
-              order.status = "refunded"
+              order.status = "order_refunded"
               order.save
               item.status = "refunded"
               refund_amount = (item.amount + item.fee + item.shipping_cost)/100
