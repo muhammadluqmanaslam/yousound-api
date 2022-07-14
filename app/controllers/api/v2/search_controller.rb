@@ -36,7 +36,7 @@ module Api::V2
           pagination: pagination(users)
         )
       rescue => e
-        render_error(e.message, 500)
+        render_success(e.message)
       end
     end
 
