@@ -375,7 +375,10 @@ class User < ApplicationRecord
 
     user_blocked_product_ids = user&.blocked_product_ids || []
     user_blocked_album_ids = user&.blocked_album_ids || []
-   
+    puts ("====objself un======")
+    puts (self.username)
+    puts ("====objuser un======")
+    puts (user.username)
     user_s = self.id.present? ? self : user
     case filter
       when 'any'
