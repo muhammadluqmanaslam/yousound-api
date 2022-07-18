@@ -375,10 +375,10 @@ class User < ApplicationRecord
 
     user_blocked_product_ids = user&.blocked_product_ids || []
     user_blocked_album_ids = user&.blocked_album_ids || []
-    Rails.info.logger ("====objself un======")
-    Rails.info.logger (self.username)
-    Rails.info.logger ("====objuser un======")
-    Rails.info.logger (user.username)
+    Rails.logger.info ("====objself un======")
+    Rails.logger.info (self.username)
+    Rails.logger.info ("====objuser un======")
+    Rails.logger.info (user.username)
     user_s = self.id.present? ? self : user
     case filter
       when 'any'
