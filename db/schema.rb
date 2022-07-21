@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210322175622) do
+ActiveRecord::Schema.define(version: 20220719120514) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -510,6 +510,17 @@ ActiveRecord::Schema.define(version: 20210322175622) do
     t.text     "options_json"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
+  end
+
+  create_table "sms_messages", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "sent_to_id"
+    t.text     "message"
+    t.string   "message_sid"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.index ["sent_to_id"], name: "index_sms_messages_on_sent_to_id", using: :btree
+    t.index ["user_id"], name: "index_sms_messages_on_user_id", using: :btree
   end
 
   create_table "stream_logs", force: :cascade do |t|

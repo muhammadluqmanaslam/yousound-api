@@ -1135,6 +1135,10 @@ GEM
     thread_safe (0.3.6-java)
     tilt (2.0.8)
     trollop (2.1.2)
+    twilio-ruby (5.69.0)
+      faraday (>= 0.9, < 3.0)
+      jwt (>= 1.5, <= 2.5)
+      nokogiri (>= 1.6, < 2.0)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
     tzinfo-data (1.2018.5)
@@ -1230,6 +1234,7 @@ DEPENDENCIES
   spring-watcher-listen (~> 2.0.0)
   stripe
   swagger-docs
+  twilio-ruby
   tzinfo-data
   zip_tricks
 

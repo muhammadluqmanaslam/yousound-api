@@ -37,8 +37,8 @@ class User < ApplicationRecord
 
   serialize :data, JsonHashSerializer
 
-  searchkick word_start: %i[id email username display_name contact_url status],
-    searchable: %i[id email username display_name contact_url status]
+  searchkick word_start: %i[id email username display_name contact_url city country gender status],
+    searchable: %i[id email username display_name contact_url city country gender status]
 
   def search_data
     # attributes
@@ -53,6 +53,9 @@ class User < ApplicationRecord
       user_type: user_type,
       display_name: display_name,
       contact_url: contact_url,
+      city: city,
+      country: country,
+      gender: gender,
       request_role: request_role,
       request_status: request_status,
       inviter_id: inviter_id,
@@ -1006,6 +1009,17 @@ class User < ApplicationRecord
       return 'Auth token has expired'
     rescue Exception
       return 'Invalid auth token'
+    end
+
+    def followers_by_city_v2(current_user)
+      follower_ids = current_user.followers.pluck(:id)
+      Rails.logger.info("===follow_ids===")
+      Rails.logger.info(follower_ids)
+      User
+            .select("Count(id), city, country")
+            .from('users')
+            .where("id IN (?) AND user_type != ? AND  city != ?", follower_ids, '', '')
+            .group(:city, :country)
     end
   end
 end

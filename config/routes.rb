@@ -20,6 +20,18 @@ Rails.application.routes.draw do
           post :search_feed
         end
       end
+
+      resources :sms do
+        collection do
+          post :sms_send
+        end
+      end
+
+      resources :users do
+        collection do
+          get :demographic_count
+        end
+      end
     end
 
     namespace :v1 do
