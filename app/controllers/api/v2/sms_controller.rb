@@ -9,7 +9,7 @@ module Api::V2
 
         swagger_api :sms_send do |api|
             summary 'send sms'
-            param :form, "message", :string, :require
+            param :form, "message", :string, :required
         end
         def sms_send
             render_error 'message parameter is required', :unprocessable_entity and return if params[:message].blank?

@@ -49,5 +49,34 @@ module Api::V2
             ageBetween.append(d)
             render_success( cities: city_counts, age_counts: ageBetween )
         end
+
+        swagger_api :by_demographic_age_options do |api|
+            summary 'List followers for demographic age options'
+            param :form, "age", :string, :required, 'like 14-21, 22-34, 35-49, 50-65'
+        end
+        def by_demographic_age_options
+            render_error 'Age parameter is required', :unprocessable_entity and return if params[:age].blank?
+
+            ageParam = params[:age].split("-")
+            if ageParam.size != 2
+                render_error 'Invalid age', :unprocessable_entity
+            end
+            users = User.followers_by_age_v2(current_user, ageParam)
+
+            render_success( users: users )
+        end
+
+        swagger_api :by_demographic_city_options do |api|
+            summary 'List followers for demographic city options'
+            param :form, "age", :string, :required, 'Like Chicago, Tokyo'
+        end
+        def by_demographic_city_options
+            render_error 'City parameter is required', :unprocessable_entity and return if params[:city].blank?
+
+            city = params[:city].capitalize()
+            users = User.followers_by_city_v2(current_user, city)
+
+            render_success( users: users )
+        end
     end
 end

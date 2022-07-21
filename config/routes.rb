@@ -30,6 +30,8 @@ Rails.application.routes.draw do
       resources :users do
         collection do
           get :demographic_count
+          post :by_demographic_age_options
+          post :by_demographic_city_options
         end
       end
     end

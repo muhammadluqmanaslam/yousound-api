@@ -1028,5 +1028,19 @@ class User < ApplicationRecord
             .group(:age, :user_type, :status)
             .order("age")
     end
+
+    def followers_by_age_v2(current_user, ageArr)
+      follower_ids = current_user.followers.pluck(:id)
+      User.select("*, (date_part('year', now())-users.year_of_birth) as age")
+            .from('users')
+            .where("id IN (?) AND year_of_birth != ? AND (date_part('year', now())-users.year_of_birth) BETWEEN ? AND ?", follower_ids, 0, ageArr[0], ageArr[1])
+            .order("first_name")
+    end
+
+    def followers_by_city_v2(current_user, city)
+      follower_ids = current_user.followers.pluck(:id)
+      User.where("id IN (?) AND city = ? ", follower_ids, city)
+            .order("first_name")
+    end
   end
 end
