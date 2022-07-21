@@ -1013,13 +1013,20 @@ class User < ApplicationRecord
 
     def followers_by_city_v2(current_user)
       follower_ids = current_user.followers.pluck(:id)
-      Rails.logger.info("===follow_ids===")
-      Rails.logger.info(follower_ids)
-      User
-            .select("Count(id), city, country")
+      User.select("Count(id) as city_count, city, country, user_type, status")
             .from('users')
-            .where("id IN (?) AND user_type != ? AND  city != ?", follower_ids, '', '')
-            .group(:city, :country)
+            .where("id IN (?) AND  city != ?", follower_ids, '')
+            .group(:city, :country, :user_type, :status)
+            .order('city_count DESC')
+    end
+
+    def followers_age_count_v2(current_user)
+      follower_ids = current_user.followers.pluck(:id)
+      User.select("Count(id), (date_part('year', now())-users.year_of_birth) as age, user_type, status")
+            .from('users')
+            .where("id IN (?) AND year_of_birth != ?", follower_ids, 0)
+            .group(:age, :user_type, :status)
+            .order("age")
     end
   end
 end
