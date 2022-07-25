@@ -45,7 +45,7 @@ Things you may want to cover:
 - tax: total tax on item regarding to quantity
 
 ## ToDo
-
+ - Write API documentation
 ### streams
 
 - rename StreamsChannel to StreamViewersChannel
