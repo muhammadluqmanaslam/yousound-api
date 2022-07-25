@@ -19,6 +19,17 @@ module Api::V1
         render_error "Pass the audio", :unprocessable_entity and return
       end
 
+      mux = Services::Mux.new
+      res = mux.createUploadUrl
+      Rails.logger.info('*** *** ***')
+      Rails.logger.info(res)
+
+      upload_url = res['data']['url']
+      upload_id = res['data']['id']
+      
+      track.description = upload_id
+      track.audio = upload_url
+      
       # clip_path = Util::Audio.clip params[:track][:audio].path
       # track.clip = File.open(clip_path)
 
