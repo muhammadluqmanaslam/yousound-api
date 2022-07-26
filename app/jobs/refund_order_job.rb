@@ -7,8 +7,7 @@ class RefundOrderJob < ApplicationJob
       orders.each do |order|
         if order.items.present? 
           order.items.each do |item|
-            token = item.payment_token.split("_")
-            if item.product.digital_content == nil and token == 'ch'
+            if item.product.digital_content == nil and item.stripe_charge_id != nil
               order.status = "order_refunded"
               order.save
               refund_response = Stripe::Refund.create({
