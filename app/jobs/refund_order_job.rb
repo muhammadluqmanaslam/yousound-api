@@ -21,7 +21,7 @@ class RefundOrderJob < ApplicationJob
                 order.payment_id = refund_response.id
                 order.status = "order_refunded"
               end
-              order.stripe_response.presets? ? order.stripe_response + refund_response.to_s : order.stripe_response
+              order.stripe_response.present? ? order.stripe_response + refund_response.to_json : order.stripe_response
               item.save
               order.save
             else
