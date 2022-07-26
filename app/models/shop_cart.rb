@@ -121,6 +121,12 @@ class ShopCart < ApplicationRecord
           orders_at: time
         },
       })
+      order = ShopOrder.find_by(payment_token: payment_token)
+      if order.present? 
+        order.stripe_charge_id = stripe_charge.id
+        order.save
+      end
+      
     rescue => ex
       return ex.message
     end
