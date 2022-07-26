@@ -34,6 +34,12 @@ Rails.application.routes.draw do
           post :by_demographic_city_options
         end
       end
+
+      resources :subscription do
+        collection do
+          post :create
+        end
+      end
     end
 
     namespace :v1 do
