@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220726165429) do
+ActiveRecord::Schema.define(version: 20220728104230) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -586,8 +586,9 @@ ActiveRecord::Schema.define(version: 20220726165429) do
   create_table "stripe_response", force: :cascade do |t|
     t.integer  "user_id"
     t.text     "response"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.string   "response_type"
     t.index ["user_id"], name: "index_stripe_response_on_user_id", using: :btree
   end
 
