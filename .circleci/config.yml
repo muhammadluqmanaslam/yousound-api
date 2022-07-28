@@ -43,6 +43,7 @@ jobs:
             sudo pip3 install awscli --upgrade
             # INSTALL AWS EB CLI
             pip3 install awsebcli botocore==1.19.63 --upgrade
+            echo "which eb"
             #sudo pip3 install awsebcli --upgrade
 
       - restore_cache:
