@@ -40,9 +40,18 @@ jobs:
           command: |
             sudo apt-get update && sudo apt-get install python3-pip -y
             ## INSTALL AWS CLI
+            sudo pip3 install --upgrade pip
+            sudo pip3 install --upgrade virtualenv
+            # INSTALL AWS CLI FOR S3 COPY COMMAND
             sudo pip3 install awscli --upgrade
+
+            # INSTALL AWS EB CLI FOR BEANSTALK DEPLOYMENT
+            sudo pip3 install awsebcli --upgrade
+
+            # sudo pip3 install awscli --upgrade
             # INSTALL AWS EB CLI
-            pip3 install awsebcli botocore==1.19.63 --upgrade
+            # pip3 install awsebcli botocore==1.19.63 --upgrade
+            echo "which eb"
             #sudo pip3 install awsebcli --upgrade
 
       - restore_cache:
