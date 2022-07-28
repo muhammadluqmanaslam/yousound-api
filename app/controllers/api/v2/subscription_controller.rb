@@ -10,25 +10,50 @@ module Api::V2
         swagger_api :create do |api|
             summary 'create subscription'
             param :form, "price_id", :string, :required
+            param :form, "token_id", :string, :required
+            param :form, "token_response", :string, :optional
         end
         def create
             render_error 'price_id parameter is required', :unprocessable_entity and return if params[:price_id].blank?
+            render_error 'token_id parameter is required', :unprocessable_entity and return if params[:token_id].blank?
 
             Rails.logger.info("==price_id===")
             Rails.logger.info(params[:price_id])
-            Rails.logger.info(current_user.id)
+            Rails.logger.info("==token_id===")
+            Rails.logger.info(params[:token_id])
+            Rails.logger.info("==token_response===")
+            Rails.logger.info(params[:token_response])
             price_param = params[:price_id]
             begin
+                StripeResponse.create({
+                    user_id: current_user.id,
+                    response: params[:token_response],
+                    response_type: 'CreateToken from frontend'
+                })
                 if current_user.stripe_customer_id == nil
+                    payment_method = Stripe::PaymentMethod.create({
+                    type: 'card',
+                    card: {
+                        token: params[:token_id]
+                    },
+                    })
+                    StripeResponse.create({
+                        user_id: current_user.id,
+                        response: payment_method.to_json,
+                        response_type: 'PaymentMethod.create'
+                    })
+                    payment_method_id = payment_method.id if payment_method.id.present?
                     customer = Stripe::Customer.create({
                         email: current_user.email,
                         name: current_user.name,
+                        payment_method: payment_method_id,
                     })
                     Rails.logger.info("==customer===")
                     Rails.logger.info(customer)
                     StripeResponse.create({
                         user_id: current_user.id,
-                        response: customer.to_json
+                        response: customer.to_json,
+                        response_type: 'Customer.create'
                     })
                     current_user.stripe_customer_id = customer.id
                     current_user.save
@@ -48,13 +73,15 @@ module Api::V2
                     if subscription.id.present?
                         current_user.stripe_subscription_id = subscription.id
                         current_user.save
+
+                        StripeResponse.create({
+                            user_id: current_user.id,
+                            response: subscription.to_json,
+                            response_type: 'Subscription.create'
+                        })
                     end
-                    
                 end
-                StripeResponse.create({
-                    user_id: current_user.id,
-                    response: subscription.to_json
-                })
+                
                 render_success(message: "Subscribed successfully.")
 
             rescue => e
