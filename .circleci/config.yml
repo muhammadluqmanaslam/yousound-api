@@ -28,6 +28,7 @@ jobs:
             elif [ "${CIRCLE_BRANCH}" == "integration" ]; then
               echo "export ENVIRONMENT=integration" >> $BASH_ENV
               echo "export EBENVIRONMENT=int" >> $BASH_ENV
+              echo "export BUNDLER_VERSION=2.1.4" >> $BASH_ENV
             # USE THIS TO DEPLOY FROM OTHER FEATURE BRANCHES
             elif [ "${CIRCLE_BRANCH}" == "fix/pyrsistent-build-issue-2" ]; then
               echo "export ENVIRONMENT=integration" >> $BASH_ENV
@@ -39,9 +40,19 @@ jobs:
           command: |
             sudo apt-get update && sudo apt-get install python3-pip -y
             ## INSTALL AWS CLI
+            sudo pip3 install --upgrade pip
+            sudo pip3 install --upgrade virtualenv
+            # INSTALL AWS CLI FOR S3 COPY COMMAND
             sudo pip3 install awscli --upgrade
-            # INSTALL AWS EB CLI
+
+            # INSTALL AWS EB CLI FOR BEANSTALK DEPLOYMENT
             sudo pip3 install awsebcli --upgrade
+
+            # sudo pip3 install awscli --upgrade
+            # INSTALL AWS EB CLI
+            # pip3 install awsebcli botocore==1.19.63 --upgrade
+            echo "which eb"
+            #sudo pip3 install awsebcli --upgrade
 
       - restore_cache:
           keys:
@@ -52,6 +63,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
+            gem install bundler -v 2.1.4
             bundle install --path vendor/bundle
             #bundle install --jobs=4 --retry=3 --path vendor/bundle --deployment
 

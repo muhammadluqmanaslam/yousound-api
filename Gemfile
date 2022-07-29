@@ -122,7 +122,7 @@ gem 'twilio-ruby'
 
 # gem 'curb'
 # gem 'down'
-
+gem 'rack-cors'
 group :development, :test do
   # capistrano
   gem 'capistrano'
