@@ -1,7 +1,7 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :id, :slug, :username, :display_name, :first_name, :last_name, :contact_url, :user_type,
     :avatar, :repost_price, :repost_price_end_at, :max_repost_price,
-    :status, :size_chart, :shipping_policy, :return_policy, :privacy_policy, :stripe_customer_id, :stripe_subscription_id
+    :status, :size_chart, :shipping_policy, :return_policy, :privacy_policy
   attribute :followers
   attribute :followings
   attribute :email, if: :include_social_info?
@@ -18,6 +18,8 @@ class UserSerializer < ActiveModel::Serializer
   attribute :enabled_view_direct_messages, if: :is_moderator?
   # attribute :message_first_visited_time, if: :is_current_user?
   attribute :data, if: :is_current_user?
+  attribute :stripe_customer_id
+  attribute :stripe_subscription_id
 
 
   # is following by current_user
