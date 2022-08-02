@@ -141,6 +141,7 @@ module Api::V1
       param :form, "user[website_url]", :string, :optional
       param :form, "user[history]", :string, :optional
       param :form, "user[request_resend]", :string, :optional
+      param :form, 'user[phone_number]', :string, :optional
     end
     def update
       authorize @user
