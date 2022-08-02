@@ -1,5 +1,5 @@
 class UserSerializer1 < ActiveModel::Serializer
-  attributes :id, :slug, :username, :display_name, :user_type, :avatar, :status
+  attributes :id, :slug, :username, :display_name, :user_type, :avatar, :status, :stripe_customer_id, :stripe_subscription_id
   attribute :stripe_connected
   attribute :is_following, if: :include_is_following?
   attribute :recent_items, if: :include_recent?
