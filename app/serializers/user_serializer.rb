@@ -18,8 +18,8 @@ class UserSerializer < ActiveModel::Serializer
   attribute :enabled_view_direct_messages, if: :is_moderator?
   # attribute :message_first_visited_time, if: :is_current_user?
   attribute :data, if: :is_current_user?
-  attribute :stripe_customer_id
-  attribute :stripe_subscription_id
+  # attribute :stripe_customer_id
+  # attribute :stripe_subscription_id
 
 
   # is following by current_user
