@@ -23,7 +23,7 @@ module Api::V1
       summary 'get mutual users'
       param :form, :page, :integer, :optional, '1, 2, etc. default is 1'
       param :form, :per_page, :integer, :optional, '-1, 10, 20, etc. default is 10'
-      params :form, :stripe_connected, :boolean, optional
+      param :form, :stripe_connected, :boolean, :optional, '0, 1'
     end
     def mutual_users
       page = params[:page] || 1

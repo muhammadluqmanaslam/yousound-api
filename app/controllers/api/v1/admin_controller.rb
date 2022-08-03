@@ -388,7 +388,7 @@ module Api::V1
     setup_authorization_header(:streams)
     swagger_api :stream do |api|
       summary 'get streams'
-      params :query, :q, :string, :optional
+      param :query, :q, :string, :optional
       param :query, :page, :integer, :optional
       param :query, :per_page, :integer, :optional
     end
