@@ -60,23 +60,22 @@ class WebController < ApplicationController
       when 'video.upload.asset_created'
         upload_id = request['data']['id']
         asset_id = request['data']['asset_id']
-        asset_type = request['data']['tracks'][0]['type'] rescue ''
-        if (asset_type == "video")
-          stream = Stream.find_by(mp_channel_2_id: upload_id)
 
-          if (stream && stream.active?)
-            stream.update_attributes(
-              mp_channel_1_id: asset_id,
-              status: Stream.statuses[:uploading]
-            )
-          end
-        elsif (asset_type == "audio")
+        stream = Stream.find_by(mp_channel_2_id: upload_id)
+        if(stream == nil) 
           track = Track.find_by(mux_audio_id_1: upload_id)
 
           if (track)
             track.update_attributes(
               mux_audio_id_2: asset_id,
               status: Track.statuses[:uploading]
+            )
+          end
+        else
+          if (stream && stream.active?)
+            stream.update_attributes(
+              mp_channel_1_id: asset_id,
+              status: Stream.statuses[:uploading]
             )
           end
         end
