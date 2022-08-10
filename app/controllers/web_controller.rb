@@ -85,6 +85,34 @@ class WebController < ApplicationController
 
           stream.notify
         end
+      when 'audio.upload.asset_created'
+        upload_id = request['data']['id']
+        asset_id = request['data']['asset_id']
+        track = Track.find_by(mux_audio_id_1: asset_id)
+
+        if (track && track.active?)
+          track.update_attributes(
+            mux_audio_id_2: asset_id,
+            status: Stream.statuses[:uploading]
+          )
+        end
+      when 'audio.asset.ready'
+        asset_id = request['data']['id']
+        track = Track.find_by(mux_audio_id_1: asset_id)
+
+        if (track && track.uploading?)
+          playback1_id = request['data']['playback_ids'][0]['id'] rescue ''
+          playback2_id = request['data']['playback_ids'][1]['id'] rescue ''
+          track.update_attributes(
+            mux_audio_id_1: playback1_id,
+            mux_audio_url_1: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8",
+            mux_audio_id_2: playback2_id,
+            mux_audio_url_1: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8",
+            status: Track.statuses[:archived]
+          )
+
+          track.notify
+        end
     end
   end
 
