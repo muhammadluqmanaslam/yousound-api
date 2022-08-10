@@ -31,7 +31,7 @@ module Api::V1
       
       track.mux_audio_id_1 = upload_id
       track.mux_audio_url_1 = upload_url
-      track.audio = upload_url
+      # track.audio = upload_url
       
       # clip_path = Util::Audio.clip params[:track][:audio].path
       # track.clip = File.open(clip_path)

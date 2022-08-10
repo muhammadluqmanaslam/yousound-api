@@ -2,7 +2,8 @@ class Track < ApplicationRecord
   # enum status: [ :inactive, :active ]
   enum status: {
     inactive: 'inactive',
-    active: 'active'
+    active: 'active',
+    uploading: 'uploading',
   }
 
   # mount_uploader :audio, AudioUploader

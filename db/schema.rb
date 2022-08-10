@@ -645,15 +645,17 @@ ActiveRecord::Schema.define(version: 20220805101158) do
     t.string   "audio"
     t.string   "clip"
     t.string   "acr_id"
-    t.integer  "played",          default: 0
-    t.integer  "downloaded",      default: 0
+    t.integer  "played",                default: 0
+    t.integer  "downloaded",            default: 0
     t.string   "status"
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-    t.text     "mux_audio_url"
-    t.string   "mux_audio_id"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.text     "mux_audio_url_1"
     t.string   "mux_audio_id_1"
+    t.string   "mp_channel_1_ep_1_id"
+    t.string   "mp_channel_1_ep_1_url"
+    t.string   "mp_channel_2_ep_1_id"
+    t.string   "mp_channel_2_ep_1_url"
     t.text     "mux_audio_url_2"
     t.string   "mux_audio_id_2"
     t.index ["album_id"], name: "index_tracks_on_album_id", using: :btree

@@ -6,6 +6,10 @@ class TrackSerializer < ActiveModel::Serializer
   attribute :mux_audio_url_1
   attribute :mux_audio_id_2
   attribute :mux_audio_url_2
+  attribute :mp_channel_1_ep_1_id
+  attribute :mp_channel_1_ep_1_url
+  attribute :mp_channel_2_ep_1_id
+  attribute :mp_channel_2_ep_1_url
 
   def user
     UserSerializer1.new(
