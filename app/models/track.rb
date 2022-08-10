@@ -2,10 +2,11 @@ class Track < ApplicationRecord
   # enum status: [ :inactive, :active ]
   enum status: {
     inactive: 'inactive',
-    active: 'active'
+    active: 'active',
+    uploading: 'uploading',
   }
 
-  mount_uploader :audio, AudioUploader
+  # mount_uploader :audio, AudioUploader
   mount_uploader :clip, AudioUploader
 
   validate :audio_size_validation, :if => "audio?"
@@ -61,7 +62,8 @@ class Track < ApplicationRecord
     #   use_ssl: false,
     #   response_content_disposition: "attachment; filename=\"#{track_name}\""
     # }
-    self.audio.url(query: {:"response-content-disposition" => "attachment; filename=\"#{track_name}\""})
+    # self.audio.url(query: {:"response-content-disposition" => "attachment; filename=\"#{track_name}\""})
+    self.audio = self.mux_audio_url_1
   end
 
   # def remove

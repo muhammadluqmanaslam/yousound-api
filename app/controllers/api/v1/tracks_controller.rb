@@ -23,12 +23,15 @@ module Api::V1
       res = mux.createUploadUrl
       Rails.logger.info('*** *** ***')
       Rails.logger.info(res)
-
+      
+      # binding.pry
+      
       upload_url = res['data']['url']
       upload_id = res['data']['id']
       
-      track.description = upload_id
-      track.audio = upload_url
+      track.mux_audio_id_1 = upload_id
+      track.mux_audio_url_1 = upload_url
+      # track.audio = upload_url
       
       # clip_path = Util::Audio.clip params[:track][:audio].path
       # track.clip = File.open(clip_path)

@@ -60,30 +60,61 @@ class WebController < ApplicationController
       when 'video.upload.asset_created'
         upload_id = request['data']['id']
         asset_id = request['data']['asset_id']
-        stream = Stream.find_by(mp_channel_2_id: upload_id)
+        asset_type = request['data']['tracks'][0]['type'] rescue ''
+        if (asset_type == "video")
+          stream = Stream.find_by(mp_channel_2_id: upload_id)
 
-        if (stream && stream.active?)
-          stream.update_attributes(
-            mp_channel_1_id: asset_id,
-            status: Stream.statuses[:uploading]
-          )
+          if (stream && stream.active?)
+            stream.update_attributes(
+              mp_channel_1_id: asset_id,
+              status: Stream.statuses[:uploading]
+            )
+          end
+        elsif (asset_type == "audio")
+          track = Track.find_by(mux_audio_id_1: upload_id)
+
+          if (track)
+            track.update_attributes(
+              mux_audio_id_2: asset_id,
+              status: Track.statuses[:uploading]
+            )
+          end
         end
       when 'video.asset.ready'
         asset_id = request['data']['id']
-        stream = Stream.find_by(mp_channel_1_id: asset_id)
+        asset_type = request['data']['tracks'][0]['type'] rescue ''
 
-        if (stream && stream.uploading?)
-          playback1_id = request['data']['playback_ids'][0]['id'] rescue ''
-          playback2_id = request['data']['playback_ids'][1]['id'] rescue ''
-          stream.update_attributes(
-            mp_channel_1_ep_1_id: playback1_id,
-            mp_channel_1_ep_1_url: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8",
-            mp_channel_2_ep_1_id: playback2_id,
-            mp_channel_2_ep_1_url: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8",
-            status: Stream.statuses[:archived]
-          )
+        if (asset_type == "video")
+          stream = Stream.find_by(mp_channel_1_id: asset_id)
+          if (stream && stream.uploading?)
+            playback1_id = request['data']['playback_ids'][0]['id'] rescue ''
+            playback2_id = request['data']['playback_ids'][1]['id'] rescue ''
+            stream.update_attributes(
+              mp_channel_1_ep_1_id: playback1_id,
+              mp_channel_1_ep_1_url: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8",
+              mp_channel_2_ep_1_id: playback2_id,
+              mp_channel_2_ep_1_url: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8",
+              status: Stream.statuses[:archived]
+            )
 
-          stream.notify
+            stream.notify
+          end
+        elsif (asset_type == "audio")
+          track = Track.find_by(mux_audio_id_2: asset_id)
+          if (track)
+            playback1_id = request['data']['playback_ids'][0]['id'] rescue ''
+            playback2_id = request['data']['playback_ids'][1]['id'] rescue ''
+            track.update_attributes(
+              mp_channel_1_ep_1_id: playback1_id,
+              mp_channel_1_ep_1_url: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8",
+              mp_channel_2_ep_1_id: playback2_id,
+              mp_channel_2_ep_1_url: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8",
+              audio: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8",
+              status: Track.statuses[:active]
+            )
+
+            track.notify
+          end
         end
     end
   end

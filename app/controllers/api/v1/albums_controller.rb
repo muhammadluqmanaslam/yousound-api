@@ -194,8 +194,8 @@ module Api::V1
         rescue => ex
         end
       end
-
-      render_errors(@album, :unprocessable_entity) and return unless @album.save
+      @album.save
+      # render_errors(@album, :unprocessable_entity) and return unless @album.save
 
       # assign original album to the tracks
       Track.where(id: track_ids).update_all(album_id: @album.id)
