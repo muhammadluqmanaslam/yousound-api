@@ -2,14 +2,14 @@ class TrackSerializer < ActiveModel::Serializer
   attributes :id, :slug, :name, :audio, :status, :downloaded, :played, :audio_download_url
   attribute :user, if: :include_user?
   attribute :album
-  attribute :mux_audio_id_1
-  attribute :mux_audio_url_1
-  attribute :mux_audio_id_2
-  attribute :mux_audio_url_2
-  attribute :mp_channel_1_ep_1_id
-  attribute :mp_channel_1_ep_1_url
-  attribute :mp_channel_2_ep_1_id
-  attribute :mp_channel_2_ep_1_url
+  # attribute :mux_audio_id_1
+  # attribute :mux_audio_url_1
+  # attribute :mux_audio_id_2
+  # attribute :mux_audio_url_2
+  # attribute :mp_channel_1_ep_1_id
+  # attribute :mp_channel_1_ep_1_url
+  # attribute :mp_channel_2_ep_1_id
+  # attribute :mp_channel_2_ep_1_url
 
   def user
     UserSerializer1.new(
