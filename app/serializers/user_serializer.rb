@@ -21,7 +21,7 @@ class UserSerializer < ActiveModel::Serializer
   attribute :stripe_customer_id
   attribute :stripe_subscription_id
   attribute :phone_number
-
+  attribute :masked_phone_number
 
   # is following by current_user
   attribute :is_following
