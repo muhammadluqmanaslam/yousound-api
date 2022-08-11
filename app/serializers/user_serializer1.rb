@@ -3,8 +3,10 @@ class UserSerializer1 < ActiveModel::Serializer
   attribute :stripe_connected
   attribute :is_following, if: :include_is_following?
   attribute :recent_items, if: :include_recent?
-  # attribute :stripe_customer_id
-  # attribute :stripe_subscription_id
+  attribute :stripe_customer_id
+  attribute :stripe_subscription_id
+  attribute :phone_number
+  attribute :masked_phone_number
 
   def is_following
     if scope && scope.current_user

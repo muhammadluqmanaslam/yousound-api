@@ -170,7 +170,10 @@ class UserPolicy < ApplicationPolicy
       :products_count,
       :annual_income,
 
-      :status
+      :status,
+      :stripe_customer_id,
+      :stripe_subscription_id,
+      :phone_number
     ]
 
     # if user.present? && user.admin?

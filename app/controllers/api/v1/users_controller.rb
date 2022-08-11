@@ -164,6 +164,16 @@ module Api::V1
       @user.request_status = User.request_statuses[:pending] if params[:user][:request_resend].present? || params[:user][:request_role].present?
 
       if @user.update(attributes)
+        Rails.logger.info("@user.id...")
+          # 
+        Rails.logger.info(@user.id)
+        Rails.logger.info("@current_user.id...")
+        Rails.logger.info(current_user.id)
+        Rails.logger.info("@phone_number.id...")
+        Rails.logger.info(current_user.phone_number)
+        if @user.id == current_user.id && @user.phone_number && !@user.masked_phone_number.present?
+          provision_phone_number(@user)
+        end
         render json: @user,
           serializer: UserSerializer,
           scope: OpenStruct.new(current_user: current_user),
@@ -989,6 +999,43 @@ module Api::V1
     private
     def set_user
       @user = User.find_by_slug(params[:id]) || User.find_by_username(params[:id]) || User.find(params[:id])
+    end
+
+    def provision_phone_number(user)
+      Rails.logger.info("function called..with user....")
+      Rails.logger.info(user)
+      @client = Twilio::REST::Client.new(ENV['TWILIO_ACCOUNT_SID'], ENV['TWILIO_AUTH_TOKEN'])
+      begin
+        # application = @client.applications
+        #              .create(
+        #                 voice_method: 'GET',
+        #                 voice_url: 'http://demo.twilio.com/docs/voice.xml',
+        #                 friendly_name: 'Phone Me'
+        #               )
+        # Rails.logger.info("application.sid")
+        # Rails.logger.info(application.sid)
+        # Lookup numbers in host area code, if none than lookup from anywhere
+        # @numbers = @client.api.available_phone_numbers('US').local.list(area_code: self.host.area_code)
+        # if @numbers.empty?
+          @numbers = @client.api.available_phone_numbers('US').local.list()
+        # end
+  
+        # Purchase the number & set the application_sid for voice and sms, will
+        # tell the number where to route calls/sms
+        @number = @numbers.first.phone_number
+        @client.api.incoming_phone_numbers.create(
+          phone_number: @number,
+          voice_application_sid: ENV['TWILIO_APPLICATION_SID'],
+          sms_application_sid: ENV['TWILIO_APPLICATION_SID']
+        )
+  
+        # Set the user.masked_phone_number
+        user.masked_phone_number(@number)
+        user.save
+      rescue Exception => e
+        puts "ERROR: #{e.message}"
+        Rails.logger.info(e)
+      end
     end
   end
 end
