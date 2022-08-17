@@ -7,6 +7,11 @@ class UserSerializer1 < ActiveModel::Serializer
   attribute :stripe_subscription_id
   attribute :phone_number
   attribute :masked_phone_number
+  attribute :age_group
+  attribute :city
+  attribute :country
+  attribute :social_provider
+  attribute :social_user_name
 
   def is_following
     if scope && scope.current_user

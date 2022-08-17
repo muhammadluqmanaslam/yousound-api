@@ -22,6 +22,8 @@ class UserSerializer < ActiveModel::Serializer
   attribute :stripe_subscription_id
   attribute :phone_number
   attribute :masked_phone_number
+  attribute :age_group
+  attribute :social_provider
 
   # is following by current_user
   attribute :is_following
@@ -38,7 +40,7 @@ class UserSerializer < ActiveModel::Serializer
   attribute :demand_stream_seconds, if: :include_social_info?
   # attribute :social_provider, if: :include_social_info?
   attribute :social_user_id, if: :include_social_info?
-  attribute :social_user_name, if: :include_social_info?
+  attribute :social_user_name
   # attribute :social_token, if: :include_social_info?
   # attribute :social_token_secret, if: :include_social_info?
 
@@ -49,8 +51,8 @@ class UserSerializer < ActiveModel::Serializer
   belongs_to :genre, if: :include_social_info?
   attribute :year_of_birth, if: :include_social_info?
   attribute :gender, if: :include_social_info?
-  attribute :country, if: :include_social_info?
-  attribute :city, if: :include_social_info?
+  attribute :country
+  attribute :city
   attribute :artist_type, if: :include_social_info?
   attribute :released_albums_count, if: :include_social_info?
   attribute :years_since_first_released, if: :include_social_info?

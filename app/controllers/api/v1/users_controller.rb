@@ -142,6 +142,11 @@ module Api::V1
       param :form, "user[history]", :string, :optional
       param :form, "user[request_resend]", :string, :optional
       param :form, 'user[phone_number]', :string, :optional
+      param :form, 'user[social_provider]', :string, :optional
+      param :form, 'user[age_group]', :string, :optional
+      param :form, 'user[country]', :string, :optional
+      param :form, 'user[city]', :string, :optional
+      param :form, 'user[social_user_name]', :string, :optional
     end
     def update
       authorize @user
