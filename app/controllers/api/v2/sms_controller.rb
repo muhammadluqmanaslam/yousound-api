@@ -36,7 +36,7 @@ module Api::V2
                             message = @client.messages.create(
                             body: params[:message],
                             to: follower.phone_number,    # Replace with your phone number
-                            from: current_user.masked_phone_number)  # Use this Magic Number for creating SMS
+                            from: "+18608912141")  # Use this Magic Number for creating SMS
                         
                             Rails.logger.info("message ===")
                             Rails.logger.info(message)
