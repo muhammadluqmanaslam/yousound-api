@@ -1,7 +1,7 @@
 module Api::V1
   class TracksController < ApiController
     swagger_controller :tracks, 'Track Management'
-    before_action :set_track, only: [:show, :update, :destroy, :download, :play]
+    before_action :set_track, only: [:show, :update, :destroy, :download, :play, :fetch_asset_input_info]
 
     swagger_api :create do |api|
       summary 'Create a track'
@@ -31,7 +31,7 @@ module Api::V1
       
       track.mux_audio_id_1 = upload_id
       track.mux_audio_url_1 = upload_url
-      # track.audio = upload_url
+      track.audio = upload_url
       
       # clip_path = Util::Audio.clip params[:track][:audio].path
       # track.clip = File.open(clip_path)
@@ -145,6 +145,15 @@ module Api::V1
       render_success true
     end
 
+    def fetch_asset_input_info
+      authorize @track
+      if @track
+        mux = Services::Mux.new
+        input_info = mux.getAssetInputInfo(@track.mux_audio_id_2)
+        input_info = input_info.parsed_response["data"].first["settings"]["url"] if input_info.parsed_response["data"].present?
+      end
+      render json: input_info
+    end
 
     private
 

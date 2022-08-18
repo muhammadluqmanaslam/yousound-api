@@ -259,6 +259,7 @@ Rails.application.routes.draw do
         member do
           get :download
           get :play
+          get :fetch_asset_input_info
         end
       end
 

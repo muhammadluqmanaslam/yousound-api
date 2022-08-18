@@ -29,6 +29,10 @@ class TrackPolicy < ApplicationPolicy
     true
   end
 
+  def fetch_asset_input_info?
+    true
+  end
+
   def permitted_attributes
     [
       :name,

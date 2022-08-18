@@ -54,6 +54,13 @@ class Services::Mux
     self.class.get("/v1/assets/#{asset_id}", options)
   end
 
+  def getAssetInputInfo(asset_id)
+    options = {
+      basic_auth: @auth
+    }
+    self.class.get("/v1/assets/#{asset_id}/input-info", options)
+  end
+
   def deleteAsset(asset_id)
     options = {
       basic_auth: @auth

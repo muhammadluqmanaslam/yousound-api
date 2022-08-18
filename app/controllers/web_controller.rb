@@ -112,7 +112,7 @@ class WebController < ApplicationController
               status: Track.statuses[:active]
             )
 
-            track.notify
+            # track.notify
           end
         end
     end
