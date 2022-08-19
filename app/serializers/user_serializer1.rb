@@ -12,6 +12,7 @@ class UserSerializer1 < ActiveModel::Serializer
   attribute :country
   attribute :social_provider
   attribute :social_user_name
+  attribute :social_url
 
   def is_following
     if scope && scope.current_user

@@ -24,6 +24,7 @@ class UserSerializer < ActiveModel::Serializer
   attribute :masked_phone_number
   attribute :age_group
   attribute :social_provider
+  attribute :social_url
 
   # is following by current_user
   attribute :is_following
