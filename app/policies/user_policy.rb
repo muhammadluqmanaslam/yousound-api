@@ -175,7 +175,8 @@ class UserPolicy < ApplicationPolicy
       :stripe_subscription_id,
       :phone_number,
       :age_group,
-      :social_provider
+      :social_provider,
+      :social_url
     ]
 
     # if user.present? && user.admin?
