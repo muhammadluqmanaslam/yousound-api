@@ -1,7 +1,7 @@
 module Api::V1
   class TracksController < ApiController
     swagger_controller :tracks, 'Track Management'
-    before_action :set_track, only: [:show, :update, :destroy, :download, :play, :convert_support_into_standard_format]
+    before_action :set_track, only: [:show, :update, :destroy, :download, :play]
 
     swagger_api :create do |api|
       summary 'Create a track'
@@ -143,14 +143,6 @@ module Api::V1
       authorize @track
       @track.play(current_user)
       render_success true
-    end
-
-    def convert_support_into_standard_format
-      authorize @track
-      if @track
-        mux = Services::Mux.new
-        mux.convert_support_into_standard_format(@track.mux_audio_id_2)
-      end
     end
 
     private

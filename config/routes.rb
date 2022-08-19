@@ -259,7 +259,6 @@ Rails.application.routes.draw do
         member do
           get :download
           get :play
-          get :convert_support_into_standard_format
         end
       end
 

@@ -29,10 +29,6 @@ class TrackPolicy < ApplicationPolicy
     true
   end
 
-  def convert_support_into_standard_format?
-    true
-  end
-
   def permitted_attributes
     [
       :name,

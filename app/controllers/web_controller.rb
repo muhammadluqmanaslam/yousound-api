@@ -100,6 +100,7 @@ class WebController < ApplicationController
           end
         elsif (asset_type == "audio")
           track = Track.find_by(mux_audio_id_2: asset_id)
+          convert_support_into_standard_format(asset_id)
           if (track)
             playback1_id = request['data']['playback_ids'][0]['id'] rescue ''
             playback2_id = request['data']['playback_ids'][1]['id'] rescue ''
@@ -194,4 +195,9 @@ class WebController < ApplicationController
   #     .map { |url, path| [open(url), path] }
   #   zipline(file_mappings, "#{product.name.parameterize}.zip")
   # end
+
+  def convert_support_into_standard_format(asset_id)
+    mux = Services::Mux.new
+    mux.convert_support_into_standard_format(asset_id)
+  end
 end
