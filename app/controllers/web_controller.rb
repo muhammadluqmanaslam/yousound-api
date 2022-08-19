@@ -105,10 +105,10 @@ class WebController < ApplicationController
             playback2_id = request['data']['playback_ids'][1]['id'] rescue ''
             track.update_attributes(
               mp_channel_1_ep_1_id: playback1_id,
-              mp_channel_1_ep_1_url: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8",
+              mp_channel_1_ep_1_url: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}/audio.m4a",
               mp_channel_2_ep_1_id: playback2_id,
-              mp_channel_2_ep_1_url: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}.m3u8",
-              audio: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}.m3u8",
+              mp_channel_2_ep_1_url: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}/audio.m4a",
+              audio: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}/audio.m4a",
               status: Track.statuses[:active]
             )
 

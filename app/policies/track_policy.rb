@@ -29,7 +29,7 @@ class TrackPolicy < ApplicationPolicy
     true
   end
 
-  def fetch_asset_input_info?
+  def convert_support_into_standard_format?
     true
   end
 

@@ -1,7 +1,7 @@
 module Api::V1
   class TracksController < ApiController
     swagger_controller :tracks, 'Track Management'
-    before_action :set_track, only: [:show, :update, :destroy, :download, :play, :fetch_asset_input_info]
+    before_action :set_track, only: [:show, :update, :destroy, :download, :play, :convert_support_into_standard_format]
 
     swagger_api :create do |api|
       summary 'Create a track'
@@ -145,14 +145,12 @@ module Api::V1
       render_success true
     end
 
-    def fetch_asset_input_info
+    def convert_support_into_standard_format
       authorize @track
       if @track
         mux = Services::Mux.new
-        input_info = mux.getAssetInputInfo(@track.mux_audio_id_2)
-        input_info = input_info.parsed_response["data"].first["settings"]["url"] if input_info.parsed_response["data"].present?
+        mux.convert_support_into_standard_format(@track.mux_audio_id_2)
       end
-      render json: input_info
     end
 
     private

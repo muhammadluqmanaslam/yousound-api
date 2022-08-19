@@ -54,11 +54,15 @@ class Services::Mux
     self.class.get("/v1/assets/#{asset_id}", options)
   end
 
-  def getAssetInputInfo(asset_id)
-    options = {
-      basic_auth: @auth
+  def convert_support_into_standard_format(asset_id)
+    body = {
+      "mp4_support": "standard"
     }
-    self.class.get("/v1/assets/#{asset_id}/input-info", options)
+    options = {
+      basic_auth: @auth,
+      body: body
+    }
+    self.class.put("/v1/assets/#{asset_id}/mp4-support", options)
   end
 
   def deleteAsset(asset_id)
