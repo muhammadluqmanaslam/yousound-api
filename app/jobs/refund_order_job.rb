@@ -24,6 +24,11 @@ class RefundOrderJob < ApplicationJob
               order.stripe_response.present? ? order.stripe_response + refund_response.to_json : order.stripe_response
               item.save
               order.save
+              StripeResponse.create({
+                  user_id: order.customer_id,
+                  response: refund_response.to_json,
+                  response_type: 'Refund.create'
+              })
             else
               Rails.logger.info("===else refund not required===")
               Rails.logger.info("item id===" + item.id.to_s)
