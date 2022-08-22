@@ -27,7 +27,7 @@ class RefundOrderJob < ApplicationJob
             else
               Rails.logger.info("===else refund not required===")
               Rails.logger.info("item id===" + item.id.to_s)
-              Rails.logger.info("order payment id==" + order.payment_token)
+              Rails.logger.info("order payment id==" + order.payment_token.to_s)
             end
           end
         end
