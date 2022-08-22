@@ -9,7 +9,7 @@ class RefundOrderJob < ApplicationJob
           order.items.each do |item|
             Rails.logger.info("order payment id==" + order.id.to_s)
             Rails.logger.info("digital content====" + item.id.to_s + item.product.digital_content.to_s)
-            if item.product.digital_content == '' and item.stripe_charge_id != ''
+            if item.product.digital_content == '' and order.stripe_charge_id != ''
               refund_response = Stripe::Refund.create({
                 charge: item.payment_token,
               })
