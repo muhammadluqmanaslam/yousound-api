@@ -2,7 +2,7 @@ class RefundOrderJob < ApplicationJob
   queue_as :default
 
   def perform
-    orders = ShopOrder.where("status = :status AND updated_at <= :updated_at", { status: "order_pending", updated_at: 1.days.ago.beginning_of_day})
+    orders = ShopOrder.where("status = :status AND updated_at <= :updated_at", { status: "order_pending", updated_at: 3.days.ago.beginning_of_day})
     if orders.present?
       orders.each do |order|
         if order.items.present? 
