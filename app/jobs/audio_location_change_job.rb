@@ -2,6 +2,7 @@ class AudioLocationChangeJob < ApplicationJob
   queue_as :default
   require 'mux_ruby'
 
+  #
   def perform
     tracks = Track.all
     s3 ||= Aws::S3::Resource.new(region: ENV['AWS_REGION'], access_key_id: ENV['AWS_ACCESS_KEY_ID'], secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'])
