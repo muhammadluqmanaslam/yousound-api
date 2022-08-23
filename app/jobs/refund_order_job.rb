@@ -2,7 +2,7 @@ class RefundOrderJob < ApplicationJob
   queue_as :default
 
   def perform
-    orders = ShopOrder.where("status = :status AND updated_at <= :updated_at", { status: "order_pending", updated_at: 3.days.ago.beginning_of_day}).order('updated_at DESC')
+    orders = ShopOrder.where("status = :status AND updated_at <= :updated_at", { status: "order_pending", updated_at: 21.days.ago.beginning_of_day}).order('updated_at DESC')
     if orders.present?
       orders.each do |order|
         if order.items.present? 
@@ -13,7 +13,7 @@ class RefundOrderJob < ApplicationJob
             if (item.product.digital_content_name == nil or item.product.digital_content_name == '') and order.payment_token.present?
               Rails.logger.info("====in if condition====")
               refund_response = Stripe::Refund.create({
-                payment_intent: order.payments[0].payment_token,
+                charge: order.payments[0].payment_token,
               })
               Rails.logger.info("===refund_response===")
               Rails.logger.info(refund_response)
@@ -23,12 +23,11 @@ class RefundOrderJob < ApplicationJob
                   response_type: 'Refund.create for order id '+ order.id.to_s
               })
               if refund_response.status == "succeeded"
-                item.status = "refunded"
+                item.status = "item_refunded"
                 item.refund_amount = refund_response.amount
-                order.payment_id = refund_response.id
+                # order.stripe_charge_id = refund_response.id
                 order.status = "order_refunded"
               end
-              order.stripe_response.present? ? order.stripe_response + refund_response.to_json : order.stripe_response
               item.save
               order.save
               
