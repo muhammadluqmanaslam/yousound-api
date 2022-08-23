@@ -2,13 +2,13 @@ class AudioLocationChangeJob < ApplicationJob
   queue_as :default
   require 'mux_ruby'
 
-  #
   def perform
     tracks = Track.all
     s3 ||= Aws::S3::Resource.new(region: ENV['AWS_REGION'], access_key_id: ENV['AWS_ACCESS_KEY_ID'], secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'])
     updated_tracks = []
     error_tracks = []
     tracks.each do |track|
+      next if [1, 2, 3, 5, 6, 7, 8, 9, 238, 239, 242, 243, 244, 245, 246, 247, 248, 249].include?(track.id)
       begin
         response = s3.bucket(ENV['AWS_S3_BUCKET']).object(track.audio.path)
 
@@ -22,6 +22,7 @@ class AudioLocationChangeJob < ApplicationJob
         error_tracks << track.id
         Rails.logger.info("=================Exception caught for Track #{track.id} = #{e.message}")
       end
+      sleep(1)
     end
     Rails.logger.info("======== Updated Track Ids are = #{updated_tracks}")
     Rails.logger.info("======== Not Updated Track Ids are = #{error_tracks}")
