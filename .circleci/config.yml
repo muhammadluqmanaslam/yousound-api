@@ -62,7 +62,7 @@ jobs:
           command: |
             bundle install --path vendor/bundle
             #bundle install --jobs=4 --retry=3 --path vendor/bundle --deployment
-            bundle exec rails swagger:docs
+#            bundle exec rails swagger:docs
       - save_cache:
           paths:
             - ./vendor/bundle
