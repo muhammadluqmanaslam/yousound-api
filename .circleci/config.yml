@@ -62,7 +62,7 @@ jobs:
           command: |
             bundle install --path vendor/bundle
             #bundle install --jobs=4 --retry=3 --path vendor/bundle --deployment
-
+            bundle exec rails swagger:docs
       - save_cache:
           paths:
             - ./vendor/bundle
@@ -147,6 +147,8 @@ jobs:
             sed -i "s/<ACRCLOUD_2_ACCESS_KEY>/$ACRCLOUD_2_ACCESS_KEY/g" Dockerrun.aws.json
             sed -i "s/<ACRCLOUD_2_ACCESS_SECRET>/$ACRCLOUD_2_ACCESS_SECRET/g" Dockerrun.aws.json
             sed -i "s/<ACRCLOUD_2_BUCKET>/$ACRCLOUD_2_BUCKET/g" Dockerrun.aws.json
+            sed -i "s/<TWILIO_ACCOUNT_SID>/$TWILIO_ACCOUNT_SID/g" Dockerrun.aws.json
+            sed -i "s/<TWILIO_AUTH_TOKEN>/$TWILIO_AUTH_TOKEN/g" Dockerrun.aws.json
             sed -i "s/<APP_NAME>/ys-api-$EBENVIRONMENT/g" ./config/newrelic.yml
 
       - deploy:
