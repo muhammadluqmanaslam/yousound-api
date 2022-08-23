@@ -6,7 +6,7 @@ class Track < ApplicationRecord
     uploading: 'uploading',
   }
 
-  # mount_uploader :audio, AudioUploader
+  mount_uploader :audio, AudioUploader
   mount_uploader :clip, AudioUploader
 
   validate :audio_size_validation, :if => "audio?"

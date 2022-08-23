@@ -105,6 +105,7 @@ gem 'swagger-docs'
 
 gem 'aws-sdk', '~> 3'
 gem 'aws-sdk-medialive', '~> 1.5.0'
+gem 'mux_ruby', '~> 3.7.0'
 
 gem 'foreman'
 
