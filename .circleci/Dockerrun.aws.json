@@ -277,6 +277,14 @@
         {
           "name": "ACRCLOUD_2_BUCKET",
           "value": "<ACRCLOUD_2_BUCKET>"
+        },
+        {
+          "name": "TWILIO_ACCOUNT_SID",
+          "value": "<TWILIO_ACCOUNT_SID>"
+        },
+        {
+          "name": "TWILIO_AUTH_TOKEN",
+          "value": "<TWILIO_AUTH_TOKEN>"
         }
       ],
       "mountPoints": [

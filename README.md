@@ -104,7 +104,7 @@ Things you may want to cover:
 ## ToDo
 
 - Write API documentation
-
+  - Swagger
 ### streams
 
 - rename StreamsChannel to StreamViewersChannel
