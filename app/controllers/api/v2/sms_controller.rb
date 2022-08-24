@@ -36,7 +36,7 @@ module Api::V2
                             message = @client.messages.create(
                             body: params[:message],
                             to: follower.phone_number,    # Replace with your phone number
-                            from: "+18608912141")  # Use this Magic Number for creating SMS
+                            from: ENV["TWILIO_FROM_NO"] || "+14422911621")  # Use this Magic Number for creating SMS
                         
                             Rails.logger.info("message ===")
                             Rails.logger.info(message)
