@@ -54,3 +54,8 @@ environment ENV.fetch("RAILS_ENV") { "development" }
 
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
+on_worker_boot do
+  system 'bundle'
+  system 'bundle exec rails db:migrate'
+  system 'bundle exec rails swagger:docs'
+end
