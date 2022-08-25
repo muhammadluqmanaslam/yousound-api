@@ -150,7 +150,11 @@ jobs:
             sed -i "s/<TWILIO_ACCOUNT_SID>/$TWILIO_ACCOUNT_SID/g" Dockerrun.aws.json
             sed -i "s/<TWILIO_AUTH_TOKEN>/$TWILIO_AUTH_TOKEN/g" Dockerrun.aws.json
             sed -i "s/<APP_NAME>/ys-api-$EBENVIRONMENT/g" ./config/newrelic.yml
-
+      - run:
+          name: post bundle
+          command: |
+            bundle exec rails db:migrate
+            bundle exec rails swagger:docs
       - deploy:
           name: 'DEPLOY TO EB'
           command: |
