@@ -151,6 +151,7 @@ class ShopProduct < ApplicationRecord
   end
 
   def shipping_price_for_location(count_in_cart = 1, country = ShopAddress::COUNTRY_EVERYWHERE_ELSE)
+    country = self.shipments.pluck(:country).include?(country) ? country : "All other countries"
     shipment = self.shipments.where(country: country).first
     if shipment.present?
       count_in_cart > 1 ? shipment.shipment_with_price : shipment.shipment_alone_price

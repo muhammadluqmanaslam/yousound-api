@@ -155,7 +155,7 @@ class ShopCart < ApplicationRecord
           else
             item_shipping_price = item.product_variant.product.shipping_price_for_location(items_count, shipping_address.country)
             item_cost = item.product_variant.price * item.quantity
-            item_shipping_cost = item_shipping_price * item.quantity
+            item_shipping_cost = item_shipping_price
             shipping += item_shipping_cost
             subtotal += item_cost
             item_tax_percent = item.product_variant.product.tax_percent_for_location(shipping_address.country, shipping_address.state)
@@ -269,7 +269,7 @@ class ShopCart < ApplicationRecord
         else
           item_cost = item.product_variant.price * item.quantity
           item_shipping_price = item.product_variant.product.shipping_price_for_location(items_count, country)
-          item_shipping_cost = item_shipping_price * item.quantity
+          item_shipping_cost = item_shipping_price
           shipping_cost += item_shipping_cost
           subtotal_cost += item_cost
           item_tax_percent = item.product_variant.product.tax_percent_for_location(country, state)
