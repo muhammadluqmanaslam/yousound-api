@@ -162,6 +162,8 @@ module Api::V1
       @user.data['stream_page_visited'] = 1 if params[:user][:stream_page_visited].to_i == 1
       @user.data['label_page_visited'] = 1 if params[:user][:label_page_visited].to_i == 1
 
+      @user.free_trial_time -= params[:user][:free_trial_time] if params[:user][:free_trial_time].present?
+
       unless params[:user][:avatar].instance_of? ActionDispatch::Http::UploadedFile
         attributes.delete('avatar')
       end
