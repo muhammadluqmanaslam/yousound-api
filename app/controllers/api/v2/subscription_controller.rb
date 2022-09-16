@@ -71,6 +71,7 @@ module Api::V2
                     Rails.logger.info(subscription)
                     
                     if subscription.id.present?
+                        current_user.plan = price_param
                         current_user.stripe_subscription_id = subscription.id
                         current_user.save
 

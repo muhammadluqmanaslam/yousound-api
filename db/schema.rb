@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220914095247) do
+ActiveRecord::Schema.define(version: 20220915102638) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -770,6 +770,7 @@ ActiveRecord::Schema.define(version: 20220914095247) do
     t.string   "age_group",                        default: ""
     t.string   "social_url",                       default: ""
     t.integer  "free_trial_time",                  default: 5400
+    t.string   "plan"
     t.index ["approver_id"], name: "index_users_on_approver_id", using: :btree
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree

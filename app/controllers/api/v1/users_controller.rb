@@ -15,7 +15,7 @@ module Api::V1
       :hidden_genres, :available_stream_period,
       :send_label_request, :remove_label, :accept_label_request, :deny_label_request,
       :share,
-      :update_status, :update_role
+      :update_status, :update_role, :fetch_subscription_details
     ]
 
     swagger_controller :users, 'user'
@@ -1001,6 +1001,23 @@ module Api::V1
         scope: OpenStruct.new(current_user: current_user),
         include_all: false,
         include_social_info: true
+    end
+
+    def fetch_subscription_details
+      authorize @user
+
+      if @user.stripe_subscription_id.present?
+        stripe_subscription = Stripe::Subscription.retrieve(@user.stripe_subscription_id)
+        trial_start = Time.at(stripe_subscription.trial_start)
+        trial_end = Time.at(stripe_subscription.trial_end)
+        if Date.today < trial_end
+          render json: "Subscribed"
+        else
+          render json: 'Your subscription period is expired.'
+        end
+      else
+        render json: 'You are not subscribed'
+      end
     end
 
     private

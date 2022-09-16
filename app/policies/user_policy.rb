@@ -3,6 +3,10 @@ class UserPolicy < ApplicationPolicy
     user.admin? || user.id == record.id
   end
 
+  def fetch_subscription_details?
+    user.id == record.id
+  end
+
   def destroy?
     user.admin? || user.moderator? || user.id == record.id
   end
