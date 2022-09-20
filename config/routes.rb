@@ -65,6 +65,7 @@ Rails.application.routes.draw do
           post :reset_password
           post :set_password
           post :is_username_available
+          post :is_email_available
           post :token_validity
         end
       end

@@ -221,9 +221,10 @@ module Api::V1
     end
     def sign_up_as_artist
       skip_authorization
-
-      user = User.where(social_user_id: params[:user][:social_user_id]).first
-      render_error 'Social account already exists', :unprocessable_entity and return if user.present?
+      if params[:user][:social_user_id].present?
+        user = User.where(social_user_id: params[:user][:social_user_id]).first
+        render_error 'Social account already exists', :unprocessable_entity and return if user.present?
+      end
 
       user = User.new(enabled_live_video: false, status: User.statuses[:inactive])
       user.attributes = permitted_attributes(user)
@@ -400,6 +401,20 @@ module Api::V1
       render_error 'Username is blank', :unprocessable_entity and return unless params[:username].present?
 
       user = User.find_by(username: params[:username].downcase)
+      render_error 'Already exists', :unprocessable_entity and return if user.present?
+
+      render_success true
+    end
+
+    swagger_api :is_email_available do |api|
+      summary "check email is available"
+      param :form, "email", :string, :required, "Email"
+    end
+    def is_email_available
+      skip_authorization
+      render_error 'Email is blank', :unprocessable_entity and return unless params[:email].present?
+
+      user = User.find_by(email: params[:email])
       render_error 'Already exists', :unprocessable_entity and return if user.present?
 
       render_success true

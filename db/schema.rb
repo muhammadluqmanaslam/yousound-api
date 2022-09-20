@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220915102638) do
+ActiveRecord::Schema.define(version: 20220914095247) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -652,12 +652,12 @@ ActiveRecord::Schema.define(version: 20220915102638) do
     t.datetime "updated_at",                        null: false
     t.text     "mux_audio_url_1"
     t.string   "mux_audio_id_1"
+    t.text     "mux_audio_url_2"
+    t.string   "mux_audio_id_2"
     t.string   "mp_channel_1_ep_1_id"
     t.string   "mp_channel_1_ep_1_url"
     t.string   "mp_channel_2_ep_1_id"
     t.string   "mp_channel_2_ep_1_url"
-    t.text     "mux_audio_url_2"
-    t.string   "mux_audio_id_2"
     t.index ["album_id"], name: "index_tracks_on_album_id", using: :btree
     t.index ["slug"], name: "index_tracks_on_slug", unique: true, using: :btree
     t.index ["user_id"], name: "index_tracks_on_user_id", using: :btree
@@ -765,12 +765,11 @@ ActiveRecord::Schema.define(version: 20220915102638) do
     t.jsonb    "data",                             default: {}
     t.string   "stripe_customer_id"
     t.string   "stripe_subscription_id"
-    t.string   "phone_number"
     t.string   "masked_phone_number"
+    t.string   "phone_number"
     t.string   "age_group",                        default: ""
     t.string   "social_url",                       default: ""
     t.integer  "free_trial_time",                  default: 5400
-    t.string   "plan"
     t.index ["approver_id"], name: "index_users_on_approver_id", using: :btree
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
