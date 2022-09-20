@@ -3,6 +3,7 @@ module Api::V2
         # skip_before_action :authenticate_token!, only: [:new_sub]
         skip_after_action :verify_authorized
         skip_after_action :verify_policy_scoped
+        skip_before_action :authenticate_token!, only: [:create], if: :current_user.blank?
 
         swagger_controller :subscription, 'subscription'
 
@@ -14,6 +15,7 @@ module Api::V2
             param :form, "token_response", :string, :optional
         end
         def create
+            current_user = User.find_by_email(params[:email]) if current_user.blank?
             render_error 'price_id parameter is required', :unprocessable_entity and return if params[:price_id].blank?
             render_error 'token_id parameter is required', :unprocessable_entity and return if params[:token_id].blank?
 
@@ -88,6 +90,12 @@ module Api::V2
                 Rails.logger.info(e.message)
                 render_success(error: e.message)
             end
+        end
+
+        private
+
+        def fetch_user
+            byebug
         end
     end
 end
