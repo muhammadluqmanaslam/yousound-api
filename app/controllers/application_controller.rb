@@ -57,7 +57,7 @@ class ApplicationController < ActionController::API
     {
       per_page: collection.limit_value,
       current_page: collection.current_page,
-      total_pages: 5,
+      total_pages: collection.total_pages,
       # count: collection.count,
       count: collection.length,
       total_count: collection.total_count,

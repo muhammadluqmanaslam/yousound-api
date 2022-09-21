@@ -110,6 +110,7 @@ Rails.application.routes.draw do
           post :update_status
           post :update_role
           get :fetch_subscription_details
+          get :creator_subscription
         end
 
         collection do

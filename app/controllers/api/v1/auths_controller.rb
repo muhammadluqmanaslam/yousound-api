@@ -229,7 +229,7 @@ module Api::V1
       user = User.new(enabled_live_video: false, status: User.statuses[:inactive])
       user.attributes = permitted_attributes(user)
       if user.save
-        user.apply_role(params[:user][:role])
+        user.apply_role(params[:user][:role] || params[:user][:user_type])
         user.reload
         render_success(user)
       else

@@ -7,6 +7,10 @@ class UserPolicy < ApplicationPolicy
     user.id == record.id
   end
 
+  def creator_subscription?
+    (["artist", "brand"]).include? (record.user_type)
+  end
+
   def destroy?
     user.admin? || user.moderator? || user.id == record.id
   end
@@ -180,7 +184,8 @@ class UserPolicy < ApplicationPolicy
       :phone_number,
       :age_group,
       :social_provider,
-      :social_url
+      :social_url,
+      :user_type
     ]
 
     # if user.present? && user.admin?

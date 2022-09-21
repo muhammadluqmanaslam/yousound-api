@@ -4,7 +4,7 @@ module Api::V1
   class UsersController < ApiController
     include ActionView::Helpers::NumberHelper
 
-    skip_before_action :authenticate_token!, only: [:info]
+    skip_before_action :authenticate_token!, only: [:info, :creator_subscription]
     before_action :authenticate_token, only: [:info]
     # skip_after_action :verify_authorized, only: [:hidden_genres]
     before_action :set_user, only: [
@@ -15,7 +15,8 @@ module Api::V1
       :hidden_genres, :available_stream_period,
       :send_label_request, :remove_label, :accept_label_request, :deny_label_request,
       :share,
-      :update_status, :update_role, :fetch_subscription_details
+      :update_status, :update_role, :fetch_subscription_details,
+      :creator_subscription
     ]
 
     swagger_controller :users, 'user'
@@ -1018,6 +1019,41 @@ module Api::V1
       else
         render json: 'You are not subscribed'
       end
+    end
+
+    def creator_subscription
+      authorize @user
+
+      render_error 'token response parameter is required', :unprocessable_entity and return if params[:token_response].blank?
+
+      begin
+        payment_method = Stripe::PaymentMethod.create({
+          type: 'card',
+          card: { token: params[:token_response][:id] },
+        })
+
+        customer = Stripe::Customer.create({
+          email: @user.email,
+          name: @user.name,
+          payment_method: payment_method.id,
+        })
+
+        StripeResponse.create({
+          user_id: @user.id,
+          response: customer.to_json,
+          response_type: 'Customer.create'
+        })
+        if @user.update(stripe_customer_id: customer.id, creator_verified: false)
+          render json: "Successfully submitted your payment request."
+        else
+          render json: "Something went wrong"
+        end
+
+      rescue => e
+        Rails.logger.info(e.message)
+        render_success(error: e.message)
+      end
+      
     end
 
     private
