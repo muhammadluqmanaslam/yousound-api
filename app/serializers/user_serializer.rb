@@ -25,6 +25,8 @@ class UserSerializer < ActiveModel::Serializer
   attribute :age_group
   attribute :social_provider
   attribute :social_url
+  attribute :plan
+  attribute :creator_verified
 
   # is following by current_user
   attribute :is_following

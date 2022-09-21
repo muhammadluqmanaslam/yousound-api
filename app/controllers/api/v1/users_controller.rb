@@ -1043,7 +1043,7 @@ module Api::V1
           response: customer.to_json,
           response_type: 'Customer.create'
         })
-        if @user.update(stripe_customer_id: customer.id, creator_verified: false)
+        if @user.update(stripe_customer_id: customer.id, creator_verified: false, plan: params[:price_id])
           render json: "Successfully submitted your payment request."
         else
           render json: "Something went wrong"
