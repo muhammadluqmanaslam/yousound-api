@@ -111,6 +111,7 @@ Rails.application.routes.draw do
           post :update_role
           get :fetch_subscription_details
           get :creator_subscription
+          get :stream_uploaded_limit_available
         end
 
         collection do

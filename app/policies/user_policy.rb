@@ -7,6 +7,10 @@ class UserPolicy < ApplicationPolicy
     user.id == record.id
   end
 
+  def stream_uploaded_limit_available?
+    user.id == record.id
+  end
+
   def creator_subscription?
     (["artist", "brand"]).include? (record.user_type)
   end

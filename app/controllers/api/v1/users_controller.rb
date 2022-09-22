@@ -16,7 +16,7 @@ module Api::V1
       :send_label_request, :remove_label, :accept_label_request, :deny_label_request,
       :share,
       :update_status, :update_role, :fetch_subscription_details,
-      :creator_subscription
+      :creator_subscription, :stream_uploaded_limit_available
     ]
 
     swagger_controller :users, 'user'
@@ -1054,6 +1054,20 @@ module Api::V1
         render_success(error: e.message)
       end
       
+    end
+
+    def stream_uploaded_limit_available
+      authorize @user
+
+      uploaded_streams_count = Stream.where(user_id: current_user.id).count
+      plan = current_user.plan
+      available_limit = plan == "pro" ? 100 : 50
+
+      if uploaded_streams_count < available_limit
+        render json: true, status: :ok
+      else
+        render json: false, status: :unprocessable_entity
+      end
     end
 
     private
