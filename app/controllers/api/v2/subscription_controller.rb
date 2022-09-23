@@ -3,7 +3,6 @@ module Api::V2
         # skip_before_action :authenticate_token!, only: [:new_sub]
         skip_after_action :verify_authorized
         skip_after_action :verify_policy_scoped
-       # skip_before_action :authenticate_token!, only: [:create], if: :current_user.blank?
 
         swagger_controller :subscription, 'subscription'
 
@@ -91,6 +90,40 @@ module Api::V2
             rescue => e
                 Rails.logger.info(e.message)
                 render_success(error: e.message)
+            end
+        end
+
+        def creator_verified
+            user = User.find_by_id(params[:user_id])
+            render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
+
+            if user.stripe_customer_id.present? && params["verify_creator"] == "approve"
+                subscription = Stripe::Subscription.create({
+                    customer: user.stripe_customer_id,
+                    items: [
+                        {price: user.plan},
+                    ],
+                    trial_period_days: 30
+                })
+
+                if subscription.id.present?
+                    user.creator_verified = true
+                    user.stripe_subscription_id = subscription.id
+                    user.save
+
+                    StripeResponse.create({
+                        user_id: user.id,
+                        response: subscription.to_json,
+                        response_type: 'Subscription.create'
+                    })
+                    render_success "Successfully approve the creator account."
+                end
+            elsif params["verify_creator"] == "reject"
+                user.creator_verified = nil
+                user.user_type = "listener"
+                user.save
+            else
+                render_error 'Something went wrong', :unprocessable_entity
             end
         end
     end

@@ -355,6 +355,19 @@ module Api::V1
       )
     end
 
+    def fetch_unverified_creators
+      render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
+
+      users = User.where(creator_verified: false, user_type: ["artist", "brand"])
+      render_success(
+        users: ActiveModel::Serializer::CollectionSerializer.new(
+          users,
+          serializer: UserSerializer,
+          scope: OpenStruct.new(current_user: current_user),
+          include_social_info: true,
+        ),
+      )
+    end
 
     setup_authorization_header(:products)
     swagger_api :products do |api|
