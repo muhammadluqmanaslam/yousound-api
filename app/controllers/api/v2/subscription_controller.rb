@@ -74,6 +74,7 @@ module Api::V2
                     
                     if subscription.id.present?
                         current_user.plan = price_param
+                        current_user.creator_verified = true if current_user.user_type != 'listener'
                         current_user.stripe_subscription_id = subscription.id
                         current_user.save
 
