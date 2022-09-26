@@ -126,5 +126,19 @@ module Api::V2
                 render_error 'Something went wrong', :unprocessable_entity
             end
         end
+
+        def free_account_credit
+            user = User.find_by_id(params[:id])
+            render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
+            subscription_id = user.stripe_subscription_id
+            if params[:free_credit_month].present? && subscription_id.present?
+                trial_update = params[:free_credit_month] == "Forever" ?
+                    Time.new + 728.days : Time.new + params[:free_credit_month].to_i.months
+                response = Stripe::Subscription.update(user.stripe_subscription_id, trial_end: trial_update.to_i)
+                render_success success_response: "Trial of #{user.username} has been updated to #{trial_update}."
+            else
+                render_error 'Something went wrong.', :unprocessable_entity and return unless params[:free_account_credit].present?
+            end
+        end
     end
 end

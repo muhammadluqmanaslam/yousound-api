@@ -358,7 +358,21 @@ module Api::V1
     def fetch_unverified_creators
       render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
 
-      users = User.where(creator_verified: false, user_type: ["artist", "brand"])
+      users = User.where("creator_verified = ? and user_type IN(?)", false, ["artist", "brand"])
+      render_success(
+        users: ActiveModel::Serializer::CollectionSerializer.new(
+          users,
+          serializer: UserSerializer,
+          scope: OpenStruct.new(current_user: current_user),
+          include_social_info: true,
+        ),
+      )
+    end
+
+    def free_account_credit_users
+      render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
+
+      users = User.where("user_type IN (?) and stripe_subscription_id is not null", ['artist', 'brand', 'listener'])
       render_success(
         users: ActiveModel::Serializer::CollectionSerializer.new(
           users,

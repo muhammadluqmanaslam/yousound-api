@@ -38,6 +38,8 @@ Rails.application.routes.draw do
       resources :subscription do
         collection do
           post :create
+          get :creator_verified
+          get :free_account_credit
         end
       end
     end
@@ -137,6 +139,8 @@ Rails.application.routes.draw do
           get :streams
           post :send_global_message
           get :global_stats
+          get :fetch_unverified_creators
+          get :free_account_credit_users
         end
       end
 
