@@ -27,6 +27,7 @@ class UserSerializer < ActiveModel::Serializer
   attribute :social_url
   attribute :plan
   attribute :creator_verified
+  attribute :trial_end
 
   # is following by current_user
   attribute :is_following

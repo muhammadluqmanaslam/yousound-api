@@ -1008,10 +1008,7 @@ module Api::V1
       authorize @user
 
       if @user.stripe_subscription_id.present?
-        stripe_subscription = Stripe::Subscription.retrieve(@user.stripe_subscription_id)
-        trial_start = Time.at(stripe_subscription.trial_start)
-        trial_end = Time.at(stripe_subscription.trial_end)
-        if Date.today < trial_end
+        if Date.today < @user.trial_end
           render json: "Subscribed"
         else
           render json: 'Your subscription period is expired.'

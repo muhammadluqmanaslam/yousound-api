@@ -91,6 +91,7 @@ class Services::Mux
     options = {
       basic_auth: @auth
     }
-    self.class.get("/v1/assets/#{upload_id}", options)
+
+    self.class.get("/v1/uploads/#{upload_id}", options)
   end
 end
