@@ -72,6 +72,8 @@ module Api::V2
                     Rails.logger.info(subscription)
                     
                     if subscription.id.present?
+                        # current_user.trial_start = Time.at(subscription.trial_start)
+                        # current_user.trial_end = Time.at(subscription.trial_end)
                         current_user.plan = price_param
                         current_user.creator_verified = true if current_user.user_type != 'listener'
                         current_user.stripe_subscription_id = subscription.id
@@ -109,13 +111,16 @@ module Api::V2
                 if subscription.id.present?
                     user.creator_verified = true
                     user.stripe_subscription_id = subscription.id
-                    user.save
 
                     StripeResponse.create({
                         user_id: user.id,
                         response: subscription.to_json,
                         response_type: 'Subscription.create'
                     })
+
+                    # user.trial_start = Time.at(subscription.trial_start)
+                    # user.trial_end = Time.at(subscription.trial_end)
+                    user.save
                     render_success "Successfully approve the creator account."
                 end
             elsif params["verify_creator"] == "reject"
@@ -134,10 +139,24 @@ module Api::V2
             if params[:free_credit_month].present? && subscription_id.present?
                 trial_update = params[:free_credit_month] == "Forever" ?
                     Time.new + 728.days : Time.new + params[:free_credit_month].to_i.months
+                trial_update = Time.new + 1.day if params[:free_credit_month] == "0"
                 response = Stripe::Subscription.update(user.stripe_subscription_id, trial_end: trial_update.to_i)
+               # user.update(trial_end: trial_update)
                 render_success success_response: "Trial of #{user.username} has been updated to #{trial_update}."
             else
                 render_error 'Something went wrong.', :unprocessable_entity and return unless params[:free_account_credit].present?
+            end
+        end
+
+        def deactivate_subscription
+            render_error 'Your account does not have any subscriptions.', :unprocessable_entity and return unless current_user.stripe_subscription_id.present?
+            stripe_subscription = Stripe::Subscription.retrieve(current_user.stripe_subscription_id)
+            if stripe_subscription.present?
+                stripe_subscription.delete(at_period_end: true)
+                ApplicationMailer.cancellation_email_template(current_user).deliver
+                render_success success_response: "Your subscription has been successfully cancelled."
+            else
+                render_error 'Something went wrong.', :unprocessable_entity
             end
         end
     end

@@ -40,6 +40,7 @@ Rails.application.routes.draw do
           post :create
           get :creator_verified
           get :free_account_credit
+          get :deactivate_subscription
         end
       end
     end

@@ -51,6 +51,15 @@ class ApplicationMailer < ActionMailer::Base
     )
   end
 
+  def cancellation_email_template(user)
+    @user = user
+    mail(
+      template_path: 'user_mailer',
+      to: @user.email,
+      subject: "Your account has been canceled. We're really sorry to see you go."
+    )
+  end
+
   # def confirmation_email(user)
   #   @resource = user
   #   @email = user.email

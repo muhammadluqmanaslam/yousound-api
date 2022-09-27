@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <p>
+      Hi <%= @user.username %>,
+    </p>
+    <p>This email confirms that your YouSound <b><%= @user.plan %> </b>Plan has been canceled. You will have full access until the end of your payment cycle that ends <%= @user.trial_end&.to_date %>, after that you will not be charged again.</p>
+
+    <p>
+      We're really sorry to see you go.
+    </p>
+    <p>If you believe this cancellation is in error or have any other questions about your account, please visit: <%= "https://downloads.intercomcdn.com/i/o/226361/0b221791770f302ffd141049/f50c73d00fda2bd6d78ce4082e70f008.png!Support"%> </p>
+    <p>Help us improve!</p>
+
+    <p>We'd love to know why you canceled. We're always looking for ways to get better. If you have feedback you think would be useful, just reply to this email and let us know!</p>
+    <p><strong>YouSound</strong></p>
+  </body>
+</html>
