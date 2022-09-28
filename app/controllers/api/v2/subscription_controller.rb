@@ -75,7 +75,13 @@ module Api::V2
                         current_user.trial_start = Time.at(subscription.trial_start)
                         current_user.trial_end = Time.at(subscription.trial_end)
                         current_user.plan = price_param
-                        current_user.creator_verified = true if current_user.user_type != 'listener'
+                        if current_user.user_type == "listener" && current_user.plan != "basic"
+                            # Listener wants to become creator for first time
+                            current_user.user_type = "artist"
+                            current_user.creator_verified = false
+                        else
+                            creator_verified = true
+                        end
                         current_user.stripe_subscription_id = subscription.id
                         current_user.save
 
