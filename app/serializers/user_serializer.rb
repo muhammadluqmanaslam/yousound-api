@@ -28,6 +28,7 @@ class UserSerializer < ActiveModel::Serializer
   attribute :plan
   attribute :creator_verified
   attribute :trial_end
+  attribute :deactivate_subscription
 
   # is following by current_user
   attribute :is_following

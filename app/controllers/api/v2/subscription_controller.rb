@@ -155,12 +155,14 @@ module Api::V2
         end
 
         def deactivate_subscription
-            render_error 'Your account does not have any subscriptions.', :unprocessable_entity and return unless current_user.stripe_subscription_id.present?
+            render_error 'Your account does not have any active subscriptions.', :unprocessable_entity and return if current_user.stripe_subscription_id.blank? || current_user.deactivate_subscription
             stripe_subscription = Stripe::Subscription.retrieve(current_user.stripe_subscription_id)
             if stripe_subscription.present?
                 stripe_subscription.delete(at_period_end: true)
+                current_user.update(deactivate_subscription: true)
+                trial_end = current_user.trial_end.to_date
                 ApplicationMailer.cancellation_email_template(current_user).deliver
-                render_success success_response: "Your subscription has been successfully cancelled."
+                render_success success_response: "Your subscription has been successfully cancelled and you can avail the services by the end of #{current_user.trial_end.to_date}."
             else
                 render_error 'Something went wrong.', :unprocessable_entity
             end
