@@ -78,7 +78,8 @@ Things you may want to cover:
   rake searchkick:reindex CLASS=User
   rake searchkick:reindex CLASS=Album
 
-  cap development staging
+  ### Deprecate
+  -  cap development staging
 
 - Connect to Server
   chmod 400 ../info/ec2-refactor2017.pem
