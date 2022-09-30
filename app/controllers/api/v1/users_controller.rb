@@ -319,8 +319,12 @@ module Api::V1
       param :form, :description, :string, :optional
     end
     def donate
-      authorize @user rescue render_error "You can't donate to yourself", :unprocessable_entity and return
-
+      authorize @user
+      if @user.id == current_user.id
+        render_error "You can't donate to yourself", :unprocessable_entity and return
+      elsif @user.creator_verified == false
+        render_error "Artist is not verified and cannot receive donations.", :unprocessable_entity and return
+      end
       amount = params[:amount].to_i rescue 0
       description = params[:description] || 'Donation'
       render_error 'Please enter the amount', :unprocessable_entity and return if amount < 100

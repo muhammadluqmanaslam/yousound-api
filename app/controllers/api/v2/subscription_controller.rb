@@ -79,9 +79,18 @@ module Api::V2
                             # Listener wants to become creator for first time
                             current_user.user_type = "artist"
                             current_user.creator_verified = false
-                        else
-                            creator_verified = true
+                        elsif current_user.user_type != "listener" && current_user.creator_verified == false
+                            current_user.creator_verified = true
                         end
+                        # artist or brand has not attach their payment details in first step and now they are subscribing creator subscription
+                        current_user.creator_verified = false if current_user.user_type != "listener" && current_user.plan != "basic"
+
+                        # user signup as a creator but now he wants to become listener
+                        if current_user.user_type != "listener" && current_user.plan == "basic"
+                            current_user.creator_verified = nil
+                            current_user.user_type = "listener"
+                        end
+                        current_user.deactivate_subscription = false
                         current_user.stripe_subscription_id = subscription.id
                         current_user.save
 
@@ -126,6 +135,7 @@ module Api::V2
 
                     user.trial_start = Time.at(subscription.trial_start)
                     user.trial_end = Time.at(subscription.trial_end)
+                    user.deactivate_subscription = false
                     user.save
                     render_success "Successfully approve the creator account."
                 end
@@ -148,7 +158,7 @@ module Api::V2
                 trial_update = Time.new + 1.day if params[:free_credit_month] == "0"
                 response = Stripe::Subscription.update(user.stripe_subscription_id, trial_end: trial_update.to_i)
                 user.update(trial_end: trial_update)
-                render_success success_response: "Trial of #{user.username} has been updated to #{trial_update}."
+                render_success success_response: "Trial of #{user.username} has been updated to #{trial_update.to_date}."
             else
                 render_error 'Something went wrong.', :unprocessable_entity and return unless params[:free_account_credit].present?
             end
