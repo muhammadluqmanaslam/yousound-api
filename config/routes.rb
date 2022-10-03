@@ -321,6 +321,7 @@ Rails.application.routes.draw do
           post :search_stream
           post :search_stream_v2
           post :search_discover
+          post :search_discover_public_user
           post :search_global
           post :search_landing
         end

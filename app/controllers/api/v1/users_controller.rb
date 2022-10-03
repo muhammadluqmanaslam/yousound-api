@@ -1010,13 +1010,14 @@ module Api::V1
 
     def fetch_subscription_details
       authorize @user
-
-      if @user.stripe_subscription_id.present?
+      if @user.stripe_subscription_id.present? && @user.user_type == "listener"
         if Date.today < @user.trial_end
           render json: "Subscribed"
         else
           render json: 'Your subscription period is expired.'
         end
+      elsif @user.user_type != "listener" && @user.creator_verified
+        render json: "Subscribed"
       else
         render json: 'You are not subscribed'
       end
