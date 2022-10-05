@@ -49,6 +49,7 @@ module Api::V1
           streams,
           scope: OpenStruct.new(current_user: current_user)
         ),
+        pagination: pagination(streams),
         genres: genres
       )
     end
@@ -60,23 +61,16 @@ module Api::V1
       per_page = (params[:per_page] || 10).to_i
       only_follows = params[:only_follows].present? ? ActiveModel::Type::Boolean.new.cast(params[:only_follows]) : false
       genre_id = params[:genre_id].to_i rescue 0
-      streams = Stream.where(
-        streams: {
-          status: [Stream.statuses[:running], Stream.statuses[:archived]],
-          notified: true
-        }
-      )
+      stream_ids = Stream.last(12).pluck(:id)
+      streams = Stream.where(id: stream_ids)
       genres = Genre.where(id: streams.pluck(:genre_id)).pluck(:name)
 
       streams = streams.where("streams.genre_id = ?", genre_id) if genre_id > 0
-      stream_ids = streams.pluck(:id).last(12)
 
-      streams = Stream.where(id: stream_ids)
       render_success(
         streams: ActiveModel::SerializableResource.new(
           streams,
         ),
-        pagination: pagination(streams),
         genres: genres
       )
     end
