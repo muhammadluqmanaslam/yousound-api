@@ -6,7 +6,8 @@ module Api::V1
       :can_view, :pay_view, :view, :watching, :pay_attachment,
       :similars
     ]
-    # skip_after_action :verify_authorized
+    skip_before_action :authenticate_token!, only: :public_user_streams
+    skip_after_action :verify_authorized, only: :public_user_streams
     # skip_after_action :verify_policy_scoped
 
     swagger_controller :streams, 'stream'
@@ -47,6 +48,33 @@ module Api::V1
         streams: ActiveModel::SerializableResource.new(
           streams,
           scope: OpenStruct.new(current_user: current_user)
+        ),
+        genres: genres
+      )
+    end
+
+    def public_user_streams
+      skip_policy_scope
+
+      page = (params[:page] || 1).to_i
+      per_page = (params[:per_page] || 10).to_i
+      only_follows = params[:only_follows].present? ? ActiveModel::Type::Boolean.new.cast(params[:only_follows]) : false
+      genre_id = params[:genre_id].to_i rescue 0
+      streams = Stream.where(
+        streams: {
+          status: [Stream.statuses[:running], Stream.statuses[:archived]],
+          notified: true
+        }
+      )
+      genres = Genre.where(id: streams.pluck(:genre_id)).pluck(:name)
+
+      streams = streams.where("streams.genre_id = ?", genre_id) if genre_id > 0
+      stream_ids = streams.pluck(:id).last(12)
+
+      streams = Stream.where(id: stream_ids)
+      render_success(
+        streams: ActiveModel::SerializableResource.new(
+          streams,
         ),
         pagination: pagination(streams),
         genres: genres

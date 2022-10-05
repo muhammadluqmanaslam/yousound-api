@@ -347,6 +347,9 @@ Rails.application.routes.draw do
           post :pay_attachment
           get :similars
         end
+        collection do
+          get :public_user_streams
+        end
       end
 
       resources :videos do
