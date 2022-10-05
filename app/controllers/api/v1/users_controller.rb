@@ -1063,7 +1063,7 @@ module Api::V1
 
       uploaded_streams_count = Stream.where(user_id: current_user.id).count
       plan = current_user.plan
-      available_limit = plan == "pro" ? 5 : 3
+      available_limit = plan == "pro" ? 100 : 50
 
       if uploaded_streams_count < available_limit
         render json: true, status: :ok
