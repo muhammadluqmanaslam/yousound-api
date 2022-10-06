@@ -25,7 +25,7 @@
 - For the deployment, a based docker image containing the Ruby installation and webservers is used. If thats required to be udpated, you can push changes to the repo https://github.com/yousound/api-docker . This repo contains two main branches:
 
 1. Master. It contains the files used to build the base docker images for production deploys.
-2. Integration. It contains the file sused to build the based cocker image for Integration deploys.
+2. Integration. It contains the files used to build the based cocker image for Integration deploys.
 
 If an update is required, its suggested that you push changes to integration first, test and then issue a PR rquest to Master. Once any of the branches is updated, CircleCI will trigger the deployment and tag the images as "latest".
 
