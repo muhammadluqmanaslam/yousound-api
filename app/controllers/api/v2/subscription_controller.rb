@@ -61,15 +61,20 @@ module Api::V2
                 end
                 
                 if current_user.stripe_customer_id.present?
-                    subscription = Stripe::Subscription.create({
-                        customer: current_user.stripe_customer_id,
-                        items: [
-                            {price: price_param},
-                        ],
-                        trial_period_days: 30
-                    })
-                    Rails.logger.info("==subscription===")
-                    Rails.logger.info(subscription)
+                    # not creating subscriptions for users who are artist or brand and first time getting subscription
+                    if current_user.creator_verified.nil? && current_user.user_type != "listener"
+                        current_user.update(creator_verified: false)
+                    else
+                        subscription = Stripe::Subscription.create({
+                            customer: current_user.stripe_customer_id,
+                            items: [
+                                {price: price_param},
+                            ],
+                            trial_period_days: 30
+                        })
+                        Rails.logger.info("==subscription===")
+                        Rails.logger.info(subscription)
+                    end
                     
                     if subscription.id.present?
                         current_user.trial_start = Time.at(subscription.trial_start)
