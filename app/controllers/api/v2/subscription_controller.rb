@@ -55,46 +55,32 @@ module Api::V2
                         response: customer.to_json,
                         response_type: 'Customer.create'
                     })
-                    current_user.plan = price_param
                     current_user.stripe_customer_id = customer.id
                     current_user.save
                 end
-                
+
                 if current_user.stripe_customer_id.present?
-                    # not creating subscriptions for users who are artist or brand and first time getting subscription
-                    if current_user.creator_verified.nil? && current_user.user_type != "listener"
-                        current_user.update(creator_verified: false)
+                    if current_user.creator_verified.nil? && current_user.user_type != "listener" && current_user.plan != "basic" && price_param != "basic"
+                        # creator do signup but he didn't attach his payment details. Now providing payment details
+                        current_user.update(creator_verified: false, plan: price_param)
+                    elsif current_user.user_type != "listener" && current_user.plan != "basic" && price_param == "basic"
+                        # user signup as a creator but now he wants to become listener
+                        current_user.update(creator_verified: nil, user_type: 'listener', plan: price_param)
+                        subscription = stripe_subscription(current_user.stripe_customer_id, price_param)
+                    elsif current_user.user_type == "listener" && current_user.plan == "basic" && price_param != "basic"
+                        # Listener wants to become creator for first time
+                        current_user.update(user_type: "artist", plan: price_param, creator_verified: false)
+                    elsif current_user.user_type != "listener" && current_user.creator_verified == false
+                        # creator resubscribing again.
+                        current_user.update(creator_verified: true)
+                        subscription = stripe_subscription(current_user.stripe_customer_id, price_param)
                     else
-                        subscription = Stripe::Subscription.create({
-                            customer: current_user.stripe_customer_id,
-                            items: [
-                                {price: price_param},
-                            ],
-                            trial_period_days: 30
-                        })
-                        Rails.logger.info("==subscription===")
-                        Rails.logger.info(subscription)
+                        subscription = stripe_subscription(current_user.stripe_customer_id, price_param)
                     end
-                    
+
                     if subscription.id.present?
                         current_user.trial_start = Time.at(subscription.trial_start)
                         current_user.trial_end = Time.at(subscription.trial_end)
-                        current_user.plan = price_param
-                        if current_user.user_type == "listener" && current_user.plan != "basic"
-                            # Listener wants to become creator for first time
-                            current_user.user_type = "artist"
-                            current_user.creator_verified = false
-                        elsif current_user.user_type != "listener" && current_user.creator_verified == false
-                            current_user.creator_verified = true
-                        end
-                        # artist or brand has not attach their payment details in first step and now they are subscribing creator subscription
-                        current_user.creator_verified = false if current_user.user_type != "listener" && current_user.plan != "basic"
-
-                        # user signup as a creator but now he wants to become listener
-                        if current_user.user_type != "listener" && current_user.plan == "basic"
-                            current_user.creator_verified = nil
-                            current_user.user_type = "listener"
-                        end
                         current_user.deactivate_subscription = false
                         current_user.stripe_subscription_id = subscription.id
                         current_user.save
@@ -106,7 +92,6 @@ module Api::V2
                         })
                     end
                 end
-                
                 render_success(message: "Subscribed successfully.")
 
             rescue => e
@@ -181,6 +166,15 @@ module Api::V2
             else
                 render_error 'Something went wrong.', :unprocessable_entity
             end
+        end
+
+        private
+
+        def stripe_subscription(stripe_customer_id, plan)
+            subscription = Stripe::Subscription.create({
+                customer: stripe_customer_id, items: [ { price: plan }, ],
+                trial_period_days: 30
+            })
         end
     end
 end
