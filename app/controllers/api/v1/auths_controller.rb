@@ -137,13 +137,13 @@ module Api::V1
         user.attributes = permitted_attributes(user)
         validate_need = true
       end
-      if params[:user][:request_role].present?
-        user.user_type = params[:user][:request_role]
-      end
-      
-      unless user.request_role.blank?
-        user.request_status = User.request_statuses[:pending]
-      end
+
+      user.request_role = "listener"
+      user.request_status = User.request_statuses[:pending]
+
+      # unless user.request_role.blank?
+      #   user.request_status = User.request_statuses[:pending]
+      # end
       # user.skip_confirmation!
       user.skip_confirmation_notification!
 
@@ -228,6 +228,8 @@ module Api::V1
 
       user = User.new(enabled_live_video: false, status: User.statuses[:inactive])
       user.attributes = permitted_attributes(user)
+      user.request_role = user.user_type
+      user.request_status = User.request_statuses[:pending]
       if user.save
         user.apply_role(params[:user][:role] || params[:user][:user_type])
         user.reload

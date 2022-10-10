@@ -123,7 +123,7 @@ module Api::V1
           where[:inviter_id] = {}
           where[:inviter_id][:not] = nil
         when 'waiting'
-          where[:user_type] = User.user_types[:listener]
+          where[:user_type] = ['artist', 'brand']
           where[:status] = User.statuses[:active]
           where[:request_status] = User.request_statuses[:pending]
           where[:inviter_id] = nil
@@ -170,18 +170,29 @@ module Api::V1
     def approve_user
       render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
       user = User.find(params[:user_id])
-      user.update_attributes(
-        approver_id: current_user.id,
-        approved_at: Time.now,
-        request_status: User.request_statuses[:accepted]
-      )
-      user.apply_role user.request_role
-      user.reload
 
-      message_body = "Hi, #{user.username} your account has been verified.<br><br>" \
-        'To accept payments you must connect to Stripe.com by logging in and visiting Settings > Bank Details on the web/desktop.<br>' \
-        'If you are already logged in, please sign out then login to update your account status.<br><br>' \
-        'Regards, YouSound Team'
+      if user.stripe_customer_id.present?
+        subscription = Stripe::Subscription.create({
+          customer: user.stripe_customer_id, items: [ { price: user.plan },], trial_period_days: 30
+        })
+
+        if subscription.id.present?
+          StripeResponse.create({ user_id: user.id, response: subscription.to_json,
+            response_type: 'Subscription.create' })
+
+          user.update(creator_verified: true, stripe_subscription_id: subscription.id,
+            trial_start: Time.at(subscription.trial_start), request_status: User.request_statuses[:accepted],
+            trial_end: Time.at(subscription.trial_end), request_role: user.user_type,
+            approver_id: current_user.id, approved_at: Time.now, deactivate_subscription: false)
+        end
+      end
+    user.apply_role user.request_role
+    user.reload
+
+    message_body = "Hi, #{user.username} your account has been verified.<br><br>" \
+      'To accept payments you must connect to Stripe.com by logging in and visiting Settings > Bank Details on the web/desktop.<br>' \
+      'If you are already logged in, please sign out then login to update your account status.<br><br>' \
+      'Regards, YouSound Team'
       # case user.request_role
       #   when 'brand'
       #     message_body = "Welcome to YouSound!<br><br>" \
@@ -235,6 +246,8 @@ module Api::V1
         denial_description: params[:denial_description],
         approver_id: current_user.id,
         approved_at: Time.now,
+        creator_verified: nil,
+        deactivate_subscription: false,
         request_status: User.request_statuses[:denied]
       )
 

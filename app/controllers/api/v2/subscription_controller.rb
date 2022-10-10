@@ -60,21 +60,30 @@ module Api::V2
                 end
 
                 if current_user.stripe_customer_id.present?
-                    if current_user.creator_verified.nil? && current_user.user_type != "listener" && current_user.plan != "basic" && price_param != "basic"
+                    if current_user.creator_verified.nil? && current_user.user_type != "listener" &&
+                        current_user.plan != "basic" && price_param != "basic"
                         # creator do signup but he didn't attach his payment details. Now providing payment details
                         current_user.update(creator_verified: false, plan: price_param)
                     elsif current_user.user_type != "listener" && current_user.plan != "basic" && price_param == "basic"
                         # user signup as a creator but now he wants to become listener
-                        current_user.update(creator_verified: nil, user_type: 'listener', plan: price_param)
+                        current_user.update(
+                            creator_verified: nil, user_type: 'listener', plan: price_param,
+                            request_role: 'listener', request_status: User.request_statuses[:pending]
+                        )
                         subscription = stripe_subscription(current_user.stripe_customer_id, price_param)
                     elsif current_user.user_type == "listener" && current_user.plan == "basic" && price_param != "basic"
                         # Listener wants to become creator for first time
-                        current_user.update(user_type: "artist", plan: price_param, creator_verified: false)
-                    elsif current_user.user_type != "listener" && current_user.creator_verified == false && current_user.trial_end.present? && current_user.stripe_subscription_id.present?
+                        current_user.update(
+                            user_type: "artist", plan: price_param, creator_verified: false,
+                            request_role: 'artist', request_status: User.request_statuses[:pending]
+                        )
+                    elsif current_user.user_type != "listener" && current_user.creator_verified == false &&
+                            current_user.trial_end.present? && current_user.stripe_subscription_id.present?
                         # creator resubscribing again.
                         current_user.update(creator_verified: true)
                         subscription = stripe_subscription(current_user.stripe_customer_id, price_param)
-                    elsif current_user.user_type == "listener" && (current_user.plan.nil? || current_user.plan == "basic") && price_param == "basic"
+                    elsif current_user.user_type == "listener" && price_param == "basic" &&
+                            (current_user.plan.nil? || current_user.plan == "basic")
                         #listener normal scenario of subscription
                         current_user.update(plan: "basic")
                         subscription = stripe_subscription(current_user.stripe_customer_id, price_param)
@@ -99,40 +108,6 @@ module Api::V2
             rescue => e
                 Rails.logger.info(e.message)
                 render_success(error: e.message)
-            end
-        end
-
-        def creator_verified
-            user = User.find_by_id(params[:user_id])
-            render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
-
-            if user.stripe_customer_id.present? && params["verify_creator"] == "approve"
-                subscription = Stripe::Subscription.create({
-                    customer: user.stripe_customer_id,
-                    items: [
-                        {price: user.plan},
-                    ],
-                    trial_period_days: 30
-                })
-
-                if subscription.id.present?
-                    StripeResponse.create({
-                        user_id: user.id,
-                        response: subscription.to_json,
-                        response_type: 'Subscription.create'
-                    })
-                    user.update(creator_verified: true, stripe_subscription_id: subscription.id,
-                        trial_start: Time.at(subscription.trial_start), request_status: User.request_statuses[:accepted],
-                        trial_end: Time.at(subscription.trial_end), request_role: user.user_type,
-                        approver_id: current_user.id, approved_at: Time.now, deactivate_subscription: false)
-                    render_success "Successfully approve the creator account."
-                end
-            elsif params["verify_creator"] == "reject"
-                user.update(creator_verified: nil, user_type: "listener",
-                    request_role: "listener", request_status: User.request_statuses[:denied])
-                user.save
-            else
-                render_error 'Something went wrong', :unprocessable_entity
             end
         end
 

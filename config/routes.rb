@@ -38,7 +38,6 @@ Rails.application.routes.draw do
       resources :subscription do
         collection do
           post :create
-          get :creator_verified
           get :free_account_credit
           get :deactivate_subscription
         end
