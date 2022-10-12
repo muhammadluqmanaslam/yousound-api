@@ -314,6 +314,9 @@ class Payment < ApplicationRecord
             order: order.external_id
           },
         })
+        StripeResponse.create({
+          user_id: receiver.id, response: stripe_transfer.to_json, response_type: 'StripeTransfer'
+        })
         return 'Stripe operation failed' if stripe_transfer['id'].blank?
       end
 
@@ -389,6 +392,9 @@ class Payment < ApplicationRecord
                   recoup_remain_amount: recoup_remain_amount,
                   order: order.external_id,
                 }
+              })
+              StripeResponse.create({
+                user_id: user_product.user.id, response: stripe_transfer.to_json, response_type: 'StripeTransfer'
               })
               return 'Stripe operation failed' if stripe_transfer['id'].blank?
 
