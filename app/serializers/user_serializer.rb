@@ -1,6 +1,6 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :id, :slug, :username, :display_name, :first_name, :last_name, :contact_url, :user_type,
-    :avatar, :repost_price, :repost_price_end_at, :max_repost_price,
+    :avatar, :repost_price, :repost_price_end_at, :max_repost_price, :trial_start,
     :status, :size_chart, :shipping_policy, :return_policy, :privacy_policy, :free_trial_time, :trial_end
   attribute :followers
   attribute :followings

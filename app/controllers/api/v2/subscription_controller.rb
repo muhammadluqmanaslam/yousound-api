@@ -121,7 +121,7 @@ module Api::V2
                 trial_update = Time.new + 1.day if params[:free_credit_month] == "0"
                 response = Stripe::Subscription.update(user.stripe_subscription_id, trial_end: trial_update.to_i)
                 user.update(trial_end: trial_update)
-                render_success success_response: "Trial of #{user.username} has been updated to #{trial_update.to_date}."
+                render_success success_response: trial_update
             else
                 render_error 'Something went wrong.', :unprocessable_entity and return unless params[:free_account_credit].present?
             end

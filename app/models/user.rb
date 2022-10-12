@@ -37,8 +37,8 @@ class User < ApplicationRecord
 
   serialize :data, JsonHashSerializer
 
-  searchkick word_start: %i[id email username display_name contact_url city country gender status],
-    searchable: %i[id email username display_name contact_url city country gender status]
+  searchkick word_start: %i[id email username display_name contact_url city country gender status creator_verified deactivate_subscription stripe_subscription_id trial_start trial_end],
+    searchable: %i[id email username display_name contact_url city country gender status creator_verified deactivate_subscription stripe_subscription_id trial_start trial_end]
 
   def search_data
     # attributes
@@ -60,7 +60,12 @@ class User < ApplicationRecord
       request_status: request_status,
       inviter_id: inviter_id,
       created_at: created_at,
-      status: status
+      status: status,
+      creator_verified: creator_verified,
+      stripe_subscription_id: stripe_subscription_id,
+      deactivate_subscription: deactivate_subscription,
+      trial_start: trial_start,
+      trial_end: trial_end
     }
   end
 

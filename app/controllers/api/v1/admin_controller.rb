@@ -368,24 +368,71 @@ module Api::V1
       )
     end
 
-    def fetch_unverified_creators
-      render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
-
-      users = User.where("creator_verified = ? and user_type IN(?)", false, ["artist", "brand"])
-      render_success(
-        users: ActiveModel::Serializer::CollectionSerializer.new(
-          users,
-          serializer: UserSerializer,
-          scope: OpenStruct.new(current_user: current_user),
-          include_social_info: true,
-        ),
-      )
-    end
-
     def free_account_credit_users
       render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
 
-      users = User.where("user_type IN (?) and stripe_subscription_id is not null", ['artist', 'brand', 'listener'])
+      filter = params[:filter] || 'any'
+      page = (params[:page] || 1).to_i
+      per_page = (params[:per_page] || 25).to_i
+      q = params[:q] || '*'
+      where = {}
+
+      case filter
+        when 'artists'
+          where[:user_type] = User.user_types[:artist]
+          where[:status] = User.statuses[:active]
+          where[:request_status] = User.request_statuses[:accepted]
+          where[:creator_verified] = true
+          where[:stripe_subscription_id] = {}
+          where[:stripe_subscription_id][:not] = nil
+        when 'brands'
+          where[:user_type] = User.user_types[:brand]
+          where[:status] = User.statuses[:active]
+          where[:request_status] = User.request_statuses[:accepted]
+          where[:stripe_subscription_id] = {}
+          where[:stripe_subscription_id][:not] = nil
+          where[:creator_verified] = true
+        when 'listeners'
+          where[:user_type] = User.user_types[:listener]
+          where[:status] = User.statuses[:active]
+          where[:stripe_subscription_id] = {}
+          where[:stripe_subscription_id][:not] = nil
+        when 'trial'
+          where[:user_type] = {}
+          where[:user_type][:not] = ['superadmin', 'admin']
+          where[:status] = User.statuses[:active]
+          where[:stripe_subscription_id] = {}
+          where[:stripe_subscription_id][:not] = nil
+        when 'cancelled'
+          where[:user_type] = {}
+          where[:user_type][:not] = ['superadmin', 'admin']
+          where[:status] = User.statuses[:active]
+          where[:deactivate_subscription] = true
+        when 'free_credit'
+          where[:user_type] = {}
+          where[:user_type][:not] = ['superadmin', 'admin']
+          where[:status] = User.statuses[:active]
+          where[:deactivate_subscription] = false
+          where[:stripe_subscription_id] = {}
+          where[:stripe_subscription_id][:not] = nil
+          where[:trial_start] = {}
+          where[:trial_start][:not] = nil
+          where[:trial_end] = {}
+          where[:trial_end][:not] = nil
+      end
+      ps = {}
+
+      ps = ps.merge(
+        fields: [:username, :display_name, :email, :creator_verified],
+        match: :word_start,
+        where: where,
+        order: {created_at: :desc},
+        page: page,
+        per_page: per_page
+      )
+
+      users = User.search(q.presence || '*', ps)
+
       render_success(
         users: ActiveModel::Serializer::CollectionSerializer.new(
           users,
@@ -393,6 +440,7 @@ module Api::V1
           scope: OpenStruct.new(current_user: current_user),
           include_social_info: true,
         ),
+        pagination: pagination(users)
       )
     end
 
