@@ -12,7 +12,11 @@ class UserPolicy < ApplicationPolicy
   end
 
   def creator_subscription?
-    (["artist", "brand"]).include? (record.user_type)
+    (["artist", "brand"]).include?(record.user_type)
+  end
+
+  def change_creator_role_into_listener?
+    return true if (["artist", "brand"]).include?(record.user_type)
   end
 
   def destroy?

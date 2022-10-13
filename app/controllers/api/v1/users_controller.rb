@@ -4,7 +4,7 @@ module Api::V1
   class UsersController < ApiController
     include ActionView::Helpers::NumberHelper
 
-    skip_before_action :authenticate_token!, only: [:info, :creator_subscription]
+    skip_before_action :authenticate_token!, only: [:info, :creator_subscription, :change_creator_role_into_listener]
     before_action :authenticate_token, only: [:info]
     # skip_after_action :verify_authorized, only: [:hidden_genres]
     before_action :set_user, only: [
@@ -14,7 +14,7 @@ module Api::V1
       :has_followed, :follow, :unfollow, :block, :unblock, :favorite, :unfavorite,
       :hidden_genres, :available_stream_period,
       :send_label_request, :remove_label, :accept_label_request, :deny_label_request,
-      :share,
+      :share, :change_creator_role_into_listener,
       :update_status, :update_role, :fetch_subscription_details,
       :creator_subscription, :stream_uploaded_limit_available
     ]
@@ -187,6 +187,18 @@ module Api::V1
           scope: OpenStruct.new(current_user: current_user),
           include_all: true,
           include_social_info: @user.id == current_user.id
+      else
+        render_errors(@user, :unprocessable_entity)
+      end
+    end
+
+    def change_creator_role_into_listener
+      authorize @user
+
+      render_error 'No params', :unprocessable_entity and return if params[:id].blank?
+
+      if @user.update(request_status: User.request_statuses[:pending], request_role: 'listener', user_type: 'listener')
+        render json: "Your role has been updated to listener."
       else
         render_errors(@user, :unprocessable_entity)
       end
@@ -1073,6 +1085,7 @@ module Api::V1
     end
 
     private
+
     def set_user
       @user = User.find_by_slug(params[:id]) || User.find_by_username(params[:id]) || User.find(params[:id])
     end

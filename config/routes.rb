@@ -118,6 +118,7 @@ Rails.application.routes.draw do
 
         collection do
           get :search
+          get :change_creator_role_into_listener
           # post :hidden_genres
         end
       end
@@ -139,7 +140,6 @@ Rails.application.routes.draw do
           get :streams
           post :send_global_message
           get :global_stats
-          get :fetch_unverified_creators
           get :free_account_credit_users
         end
       end
