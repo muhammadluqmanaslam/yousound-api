@@ -394,7 +394,7 @@ class Payment < ApplicationRecord
                 }
               })
               StripeResponse.create({
-                user_id: user_product.user.id, response: stripe_transfer.to_json, response_type: 'StripeTransfer'
+                user_id: user_product.user.id, response: stripe_transfer.to_json, response_type: 'StripeTransferCollaboratorRecoup'
               })
               return 'Stripe operation failed' if stripe_transfer['id'].blank?
 
@@ -444,7 +444,9 @@ class Payment < ApplicationRecord
                 }
               })
               next if stripe_transfer['id'].blank?
-
+              StripeResponse.create({
+                user_id: user_product.user.id, response: stripe_transfer.to_json, response_type: 'StripeTransferCollaborator'
+              })
               Payment.create(
                 sender_id: sender.id,
                 receiver_id: user_product.user_id,
