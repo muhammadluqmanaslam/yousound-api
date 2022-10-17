@@ -13,6 +13,10 @@ class AlbumPolicy < ApplicationPolicy
     true
   end
 
+  def public?
+    true
+  end
+
   def create?
     true
     # user.admin? || user.artist?

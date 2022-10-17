@@ -29,6 +29,10 @@ class TrackPolicy < ApplicationPolicy
     true
   end
 
+  def play_public_user?
+    true
+  end
+
   def permitted_attributes
     [
       :name,

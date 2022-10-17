@@ -227,6 +227,7 @@ Rails.application.routes.draw do
           post :rearrange
           post :add_tracks
           post :remove_tracks
+          get :public
         end
 
         collection do
@@ -267,6 +268,7 @@ Rails.application.routes.draw do
         member do
           get :download
           get :play
+          get :play_public_user
         end
       end
 

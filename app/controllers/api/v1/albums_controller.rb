@@ -5,9 +5,9 @@ module Api::V1
       :request_repost, :repost, :unrepost, :accept_collaboration, :deny_collaboration,
       :send_label_request, :remove_label, :accept_label_request, :deny_label_request,
       :make_public, :make_private, :make_live_video_only, :recommend, :unrecommend,
-      :report, :hide, :download, :play, :rearrange, :add_tracks, :remove_tracks
+      :report, :hide, :download, :play, :rearrange, :add_tracks, :remove_tracks, :public
     ]
-    skip_before_action :authenticate_token!, only: [:show, :my_role]
+    skip_before_action :authenticate_token!, only: [:show, :my_role, :public]
     before_action :authenticate_token, only: [:show, :my_role]
 
     swagger_controller :albums, 'album'
@@ -124,6 +124,20 @@ module Api::V1
         include_labels: true,
         include_labels_user: true,
         include_samplings: true
+      # render_success(@album)
+    end
+
+    swagger_api :public do |api|
+      summary 'get an album for public user'
+      param :header, 'Authorization', :string, :optional, 'Authentication token'
+      param :path, :id, :string, :required, 'album id and slug'
+    end
+    def public
+      authorize @album
+
+      render json:
+        @album,
+        serializer: AlbumSerializer
       # render_success(@album)
     end
 

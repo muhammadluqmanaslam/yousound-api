@@ -1,8 +1,8 @@
 module Api::V1
   class TracksController < ApiController
     swagger_controller :tracks, 'Track Management'
-    before_action :set_track, only: [:show, :update, :destroy, :download, :play]
-
+    before_action :set_track, only: [:show, :update, :destroy, :download, :play, :play_public_user]
+    skip_before_action :authenticate_token!, only: [:play_public_user]
     swagger_api :create do |api|
       summary 'Create a track'
       param :form, 'track[name]', :string, :required
@@ -142,6 +142,16 @@ module Api::V1
     def play
       authorize @track
       @track.play(current_user)
+      render_success true
+    end
+
+    setup_authorization_header(:play)
+    swagger_api :play_public_user do |api|
+      summary 'play a track'
+      param :path, :id, :string, :required
+    end
+    def play_public_user
+      authorize @track
       render_success true
     end
 
