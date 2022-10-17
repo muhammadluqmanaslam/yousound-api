@@ -61,16 +61,14 @@ module Api::V1
       per_page = (params[:per_page] || 10).to_i
       only_follows = params[:only_follows].present? ? ActiveModel::Type::Boolean.new.cast(params[:only_follows]) : false
       genre_id = params[:genre_id].to_i rescue 0
-      stream_ids = Stream.last(12).pluck(:id)
-      streams = Stream.where(id: stream_ids)
+
+      streams = Stream.order('created_at desc').page(page).per(per_page)
       genres = Genre.where(id: streams.pluck(:genre_id)).pluck(:name)
-
-      streams = streams.where("streams.genre_id = ?", genre_id) if genre_id > 0
-
       render_success(
         streams: ActiveModel::SerializableResource.new(
           streams,
         ),
+        pagination: pagination(streams),
         genres: genres
       )
     end
