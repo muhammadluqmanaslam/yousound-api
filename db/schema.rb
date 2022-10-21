@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220928123415) do
+ActiveRecord::Schema.define(version: 20220929101851) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -634,6 +634,19 @@ ActiveRecord::Schema.define(version: 20220928123415) do
     t.index ["open_user_id"], name: "index_tickets_on_open_user_id", using: :btree
     t.index ["order_id"], name: "index_tickets_on_order_id", using: :btree
     t.index ["product_id"], name: "index_tickets_on_product_id", using: :btree
+  end
+
+  create_table "trackings", force: :cascade do |t|
+    t.integer  "creator_id"
+    t.integer  "listener_id"
+    t.integer  "duration"
+    t.integer  "track_id"
+    t.integer  "stream_id"
+    t.boolean  "active",      default: true
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.index ["stream_id"], name: "index_trackings_on_stream_id", using: :btree
+    t.index ["track_id"], name: "index_trackings_on_track_id", using: :btree
   end
 
   create_table "tracks", force: :cascade do |t|

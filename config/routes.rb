@@ -201,6 +201,11 @@ Rails.application.routes.draw do
 
       resources :genres, only: [:index] do
       end
+      resources :trackings do
+        collection do
+          get :dashboard_stats
+        end
+      end
 
       resources :albums do
         member do

@@ -8,7 +8,6 @@ class AudioLocationChangeJob < ApplicationJob
     updated_tracks = []
     error_tracks = []
     tracks.each do |track|
-      next if [1, 2, 3, 5, 6, 7, 8, 9, 238, 239, 242, 243, 244, 245, 246, 247, 248, 249].include?(track.id)
       begin
         response = s3.bucket(ENV['AWS_S3_BUCKET']).object(track.audio.path)
 

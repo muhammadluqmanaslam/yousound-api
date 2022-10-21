@@ -100,6 +100,7 @@ class User < ApplicationRecord
 
   has_many :products, foreign_key: 'merchant_id', class_name: 'ShopProduct'
   has_many :variants, through: :products
+  has_many :trackings, foreign_key: 'creator_id', dependent: :destroy
 
   has_many :addresses, foreign_key: 'customer_id', class_name: 'ShopAddress'
   belongs_to :default_address, foreign_key: 'address_id', class_name: 'ShopAddress'
