@@ -80,5 +80,17 @@ class Tracking < ApplicationRecord
 
     (5.to_f/played_count.length).round(3).to_s[0..3].to_f
   end
+
+  def self.stripe_funds_transfer(user)
+    play = most_listened_creators(user)
+    users = User.where(id: play.pluck(:id))
+    play.each do |record|
+      Stripe::Transfer.create(
+        amount: (record[:subscriptionShare]*100).to_i,
+        currency: 'usd',
+        destination: users.select{|u| u.id == record[:id]}.first&.payment_account_id
+      )
+    end
+  end
 end
 

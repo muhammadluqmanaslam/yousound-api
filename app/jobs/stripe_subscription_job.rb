@@ -23,6 +23,7 @@ class StripeSubscriptionJob < ApplicationJob
           user.update(trial_start: Time.at(stripe_subscription.trial_start),
             trial_end: Time.at(stripe_subscription.trial_end)
           )
+          Tracking.stripe_fund_transfer(user)
         end
       rescue => ex
         Rails.logger.info("==============Error #{ex}")
