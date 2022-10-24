@@ -7,8 +7,8 @@ class Tracking < ApplicationRecord
 
   def self.most_listened_creators(listener)
     trackings =  Tracking.joins(:creator).includes(:creator)
-    .where("trackings.listener_id = ? and trackings.active = ? and
-      users.payment_account_id IS NOT NULL", listener.id, true)
+      .where("trackings.listener_id = ? and trackings.active = ? and
+        users.payment_account_id IS NOT NULL", listener.id, true)
     play = count_plays(trackings)
     playedViewed = play.pluck(:playedViewed)
     if playedViewed.first(10).uniq.length != playedViewed.first(10).length
@@ -30,7 +30,7 @@ class Tracking < ApplicationRecord
     played_count = played_count.sort_by { |key| key }.to_h #Most listened artists stayed on top
     play = []
     played_count.keys.each do |creator_id|
-      username = trackings.select { |t| t.creator_id == creator_id}.first.creator.username
+      username = trackings.select { |t| t.creator_id == creator_id}&.first&.creator&.username
       play.push(
         user: username,
         playedViewed: played_count[creator_id],
@@ -67,7 +67,7 @@ class Tracking < ApplicationRecord
 
   def self.creators_signup_date(trackings, play)
     play.each do |record|
-      signup_date = trackings.select{|t| t.creator_id == record[:id]}.first.creator.created_at
+      signup_date = trackings.select{|t| t.creator_id == record[:id]}.first&.creator&.created_at
       record[:signup_date] = signup_date
     end
 
