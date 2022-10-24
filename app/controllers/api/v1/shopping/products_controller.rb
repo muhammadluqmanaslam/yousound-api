@@ -168,7 +168,7 @@ module Api::V1::Shopping
 
       total_collaborators_share = 0
       collaborators.each do |collaborator|
-        total_collaborators_share += obj[collaborator.id]['user_share']
+        total_collaborators_share += obj[collaborator.id]['user_share'] if obj[collaborator.id].present?
       end
       creator_share = 100 - total_collaborators_share
       creator_recoup_cost = (params[:shop_product][:creator_recoup_cost] || 0).to_i
@@ -192,7 +192,7 @@ module Api::V1::Shopping
             user_id: collaborator.id,
             product_id: @product.id,
             user_type: UserProduct.user_types[:collaborator],
-            user_share: obj[collaborator.id]['user_share'],
+            user_share: obj[collaborator.id].present? ? obj[collaborator.id]['user_share'] : 0,
             status: UserProduct.statuses[:pending]
           )
 
