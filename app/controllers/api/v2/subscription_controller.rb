@@ -141,6 +141,42 @@ module Api::V2
             end
         end
 
+        def subscription_change
+            selectedPlan = params[:selectedPlan]
+            message = ''
+
+            if(current_user.plan == 'basic' && selectedPlan != 'basic')
+                #listener upgrading his plan and becoming artist
+                current_user.update(
+                    user_type: "artist", plan: selectedPlan, creator_verified: false,
+                    request_role: 'artist', request_status: User.request_statuses[:pending]
+                )
+                message = "Your plan has been upgraded and you will be notified once your account will be verified. In the meanwhile, you will remain in your current plan"
+                ApplicationMailer.subscription_change_email(current_user, message).deliver_later
+                render_success success_response: message
+            elsif ['plus', 'pro'].include?(current_user.plan) && selectedPlan == 'basic'
+                #artist downgrading toward listener
+                response = stripe_subscription_change(selectedPlan)
+                return unless response.id.present?
+                current_user.update(
+                    creator_verified: nil, user_type: 'listener', plan: selectedPlan,
+                    request_role: 'listener', request_status: User.request_statuses[:pending]
+                )
+                message = "Your request has been processed and your subscription plan has been downgraded to Listener."
+                ApplicationMailer.subscription_change_email(current_user, message).deliver_later
+                render_success success_response: message
+            else
+                response = stripe_subscription_change(selectedPlan)
+
+                return unless response.id.present?
+                current_user.update(plan: selectedPlan)
+                message = "Your request has been processed and your plan has been #{selectedPlan == 'pro' ? 'Upgraded to Advanced Plan' : 'Downgraded to Creator Plan'} according to your request."
+                ApplicationMailer.subscription_change_email(current_user, message).deliver_later
+                render_success success_response: message
+            end
+
+        end
+
         private
 
         def stripe_subscription(stripe_customer_id, plan)
@@ -148,6 +184,18 @@ module Api::V2
                 customer: stripe_customer_id, items: [ { price: plan }, ],
                 trial_period_days: 30
             })
+        end
+
+        def stripe_subscription_change(selectedPlan)
+            subscription = Stripe::Subscription.retrieve(current_user.stripe_subscription_id)
+
+            Stripe::Subscription.update(
+                subscription.id,
+                {
+                    cancel_at_period_end: false, proration_behavior: 'create_prorations',
+                    items: [ { id: subscription.items.data[0].id, plan: selectedPlan } ]
+                }
+            )
         end
     end
 end

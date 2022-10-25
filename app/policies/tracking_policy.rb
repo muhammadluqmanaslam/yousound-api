@@ -8,7 +8,6 @@ class TrackingPolicy < ApplicationPolicy
   end
 
   def dashboard_stats?
-    byebug
     true
   end
 

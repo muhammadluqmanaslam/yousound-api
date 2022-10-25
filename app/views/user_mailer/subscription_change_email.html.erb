@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  </head>
+  <body>
+    <p>
+      Hi <%= @user.username %>,
+    </p>
+    <p><%= @message %> </p>
+
+    <p>If you believe this is an error or have any other questions about your account, please visit: <p>
+    <br>
+    <p> <%= link_to "support.yousound.com", "https://support.yousound.com/"%> </p>
+    <br>
+
+    <p><strong>YouSound</strong></p>
+  </body>
+</html>

@@ -41,6 +41,16 @@ class ApplicationMailer < ActionMailer::Base
     )
   end
 
+  def subscription_change_email(user, message)
+    @user = user
+    @message = message
+    mail(
+      template_path: 'user_mailer',
+      to: @user.email,
+      subject: 'Subscription Plan change'
+    )
+  end
+
   def to_requester_denied_email(verifier, requester)
     @verifier = verifier
     @requester = requester

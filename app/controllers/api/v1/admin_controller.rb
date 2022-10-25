@@ -170,20 +170,30 @@ module Api::V1
     def approve_user
       render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
       user = User.find(params[:user_id])
+      if user.stripe_subscription_id.present? && user.creator_verified == false
+        subscription = stripe_subscription_change(user)
+        return if subscription.id.blank?
 
-      if user.stripe_customer_id.present?
-        subscription = Stripe::Subscription.create({
-          customer: user.stripe_customer_id, items: [ { price: user.plan },], trial_period_days: 30
-        })
+        user.update(
+          stripe_subscription_id: subscription.id, creator_verified: true,
+          request_role: user.user_type, request_status: User.request_statuses[:accepted],
+          approver_id: current_user.id, approved_at: Time.now, deactivate_subscription: false
+        )
+      else
+        if user.stripe_customer_id.present?
+          subscription = Stripe::Subscription.create({
+            customer: user.stripe_customer_id, items: [ { price: user.plan },], trial_period_days: 30
+          })
 
-        if subscription.id.present?
-          StripeResponse.create({ user_id: user.id, response: subscription.to_json,
-            response_type: 'Subscription.create' })
+          if subscription.id.present?
+            StripeResponse.create({ user_id: user.id, response: subscription.to_json,
+              response_type: 'Subscription.create' })
 
-          user.update(creator_verified: true, stripe_subscription_id: subscription.id,
-            trial_start: Time.at(subscription.trial_start), request_status: User.request_statuses[:accepted],
-            trial_end: Time.at(subscription.trial_end), request_role: user.user_type,
-            approver_id: current_user.id, approved_at: Time.now, deactivate_subscription: false)
+            user.update(creator_verified: true, stripe_subscription_id: subscription.id,
+              trial_start: Time.at(subscription.trial_start), request_status: User.request_statuses[:accepted],
+              trial_end: Time.at(subscription.trial_end), request_role: user.user_type,
+              approver_id: current_user.id, approved_at: Time.now, deactivate_subscription: false)
+          end
         end
       end
     user.apply_role user.request_role
@@ -248,7 +258,8 @@ module Api::V1
         approved_at: Time.now,
         creator_verified: nil,
         deactivate_subscription: false,
-        request_status: User.request_statuses[:denied]
+        request_status: User.request_statuses[:denied],
+        plan: 'basic'
       )
 
       ApplicationMailer.to_requester_denied_email(current_user, user).deliver
@@ -733,6 +744,20 @@ module Api::V1
         cancelled_accounts: cancelled_accounts,
       }
       render json: states
+    end
+
+    private
+
+    def stripe_subscription_change(user)
+      subscription = Stripe::Subscription.retrieve(user.stripe_subscription_id)
+
+      Stripe::Subscription.update(
+          subscription.id,
+          {
+              cancel_at_period_end: false, proration_behavior: 'create_prorations',
+              items: [ { id: subscription.items.data[0].id, plan: user.plan } ]
+          }
+      )
     end
   end
 end
