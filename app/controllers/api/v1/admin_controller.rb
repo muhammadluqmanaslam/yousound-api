@@ -125,7 +125,7 @@ module Api::V1
         when 'waiting'
           where[:user_type] = ['artist', 'brand']
           where[:status] = User.statuses[:active]
-          where[:request_status] = User.request_statuses[:pending]
+          where[:request_status] = ["pending", "denied"]
           where[:inviter_id] = nil
         when 'approved'
           where[:user_type] = {}
@@ -144,7 +144,7 @@ module Api::V1
         fields: [:username, :display_name, :email],
         match: :word_start,
         where: where,
-        order: {username: :asc},
+        order: {updated_at: :desc},
         page: page,
         per_page: per_page
       )
@@ -258,8 +258,7 @@ module Api::V1
         approved_at: Time.now,
         creator_verified: nil,
         deactivate_subscription: false,
-        request_status: User.request_statuses[:denied],
-        plan: 'basic'
+        request_status: User.request_statuses[:denied]
       )
 
       ApplicationMailer.to_requester_denied_email(current_user, user).deliver

@@ -39,6 +39,10 @@ class UserPolicy < ApplicationPolicy
     user.id == record.id
   end
 
+  def creator_re_request?
+    user.id == record.id
+  end
+
   def check_stripe_connection?
     true
   end

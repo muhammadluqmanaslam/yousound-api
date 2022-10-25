@@ -60,6 +60,7 @@ class User < ApplicationRecord
       request_status: request_status,
       inviter_id: inviter_id,
       created_at: created_at,
+      updated_at: updated_at,
       status: status,
       creator_verified: creator_verified,
       stripe_subscription_id: stripe_subscription_id,

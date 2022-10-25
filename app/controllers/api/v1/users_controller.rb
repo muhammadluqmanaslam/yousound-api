@@ -16,7 +16,7 @@ module Api::V1
       :send_label_request, :remove_label, :accept_label_request, :deny_label_request,
       :share, :change_creator_role_into_listener,
       :update_status, :update_role, :fetch_subscription_details,
-      :creator_subscription, :stream_uploaded_limit_available
+      :creator_subscription, :stream_uploaded_limit_available, :creator_re_request
     ]
 
     swagger_controller :users, 'user'
@@ -282,6 +282,27 @@ module Api::V1
 
       @user.update_attributes(password: params[:new_password])
       render_success true
+    end
+
+    def creator_re_request
+      authorize @user
+      render_error('User must be present', :unprocessable_entity) and return unless @user.present?
+
+      if @user.re_requested_at.present?
+        days = (Date.today - @user.re_requested_at.to_date).to_i
+        render_error("You can't request at this moment", :unprocessable_entity) and return if days < 30
+      end
+
+      @user.update_attributes(
+        creator_verified: false,
+        re_requested_at: Time.now,
+        user_type: 'artist'
+      )
+      render json: @user,
+        serializer: UserSerializer,
+        scope: OpenStruct.new(current_user: current_user),
+        include_all: true,
+        include_social_info: @user.id == current_user.id
     end
 
 

@@ -115,6 +115,7 @@ Rails.application.routes.draw do
           get :fetch_subscription_details
           get :creator_subscription
           get :stream_uploaded_limit_available
+          get :creator_re_request
         end
 
         collection do
