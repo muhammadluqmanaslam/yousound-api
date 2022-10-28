@@ -18,7 +18,7 @@ module Api::V1
 
       attributes = permitted_attributes(@tracking)
 
-      if @tracking.update(attributes)
+      if @tracking.creator_id != @tracking.listener_id && @tracking.update(attributes)
         render_success true
       else
         render_error 'Something went wrong.', :unprocessable_entity

@@ -58,7 +58,6 @@ module Api::V2
                     current_user.stripe_customer_id = customer.id
                     current_user.save
                 end
-
                 if current_user.stripe_customer_id.present?
                     if current_user.creator_verified.nil? && current_user.user_type != "listener" &&
                         current_user.plan != "basic" && price_param != "basic"
@@ -71,8 +70,8 @@ module Api::V2
                             request_role: 'listener', request_status: User.request_statuses[:pending]
                         )
                         subscription = stripe_subscription(current_user.stripe_customer_id, price_param)
-                    elsif current_user.user_type == "listener" && current_user.plan == "basic" && price_param != "basic"
-                        # Listener wants to become creator for first time
+                    elsif current_user.user_type == "listener" && (current_user.plan == "basic" || current_user.plan.nil?) && price_param != "basic"
+                        # Listener or free plan users wants to become creator for first time
                         current_user.update(
                             user_type: "artist", plan: price_param, creator_verified: false,
                             request_role: 'artist', request_status: User.request_statuses[:pending]
@@ -145,7 +144,7 @@ module Api::V2
             selectedPlan = params[:selectedPlan]
             message = ''
 
-            if(current_user.plan == 'basic' && selectedPlan != 'basic')
+            if((current_user.plan == 'basic' || current_user.plan.nil?) && selectedPlan != 'basic')
                 #listener upgrading his plan and becoming artist
                 current_user.update(
                     user_type: "artist", plan: selectedPlan, creator_verified: false,
@@ -156,6 +155,8 @@ module Api::V2
                 render_success success_response: message
             elsif ['plus', 'pro'].include?(current_user.plan) && selectedPlan == 'basic'
                 #artist downgrading toward listener
+                render_error "Your account is pending for verification please wait until admin approve your account.", :unprocessable_entity and return if current_user.stripe_subscription_id.blank?
+
                 response = stripe_subscription_change(selectedPlan)
                 return unless response.id.present?
                 current_user.update(
@@ -166,6 +167,7 @@ module Api::V2
                 ApplicationMailer.subscription_change_email(current_user, message).deliver_later
                 render_success success_response: message
             else
+                render_error "Your account is pending for verification please wait until admin approve your account.", :unprocessable_entity and return if current_user.stripe_subscription_id.blank?
                 response = stripe_subscription_change(selectedPlan)
 
                 return unless response.id.present?

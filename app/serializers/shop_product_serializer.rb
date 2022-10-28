@@ -56,11 +56,11 @@ class ShopProductSerializer < ActiveModel::Serializer
   end
 
   def creator_share
-    object.user_products.where(users_products: { user_type: UserProduct.user_types[:creator] }).first.user_share
+    object.user_products.where(users_products: { user_type: UserProduct.user_types[:creator] }).first&.user_share
   end
 
   def creator_recoup_cost
-    object.user_products.where(users_products: { user_type: UserProduct.user_types[:creator] }).first.recoup_cost
+    object.user_products.where(users_products: { user_type: UserProduct.user_types[:creator] }).first&.recoup_cost
   end
 
   def covers
