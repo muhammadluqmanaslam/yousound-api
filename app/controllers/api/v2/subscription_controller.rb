@@ -146,9 +146,13 @@ module Api::V2
 
             if((current_user.plan == 'basic' || current_user.plan.nil?) && selectedPlan != 'basic')
                 #listener upgrading his plan and becoming artist
+                render_error('Please select social platform and social user name to proceed', :unprocessable_entity) and return if params[:social_provider].blank? || params[:social_user_name].blank?
+
                 current_user.update(
                     user_type: "artist", plan: selectedPlan, creator_verified: false,
-                    request_role: 'artist', request_status: User.request_statuses[:pending]
+                    request_role: 'artist', request_status: User.request_statuses[:pending],
+                    social_provider: params[:social_provider],
+                    social_user_name: params[:social_user_name]
                 )
                 message = "Your plan has been upgraded and you will be notified once your account will be verified. In the meanwhile, you will remain in your current plan"
                 ApplicationMailer.subscription_change_email(current_user, message).deliver_later

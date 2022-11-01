@@ -286,7 +286,7 @@ module Api::V1
 
     def creator_re_request
       authorize @user
-      render_error('User must be present', :unprocessable_entity) and return unless @user.present?
+      render_error('Please select social platform and social user name to proceed', :unprocessable_entity) and return if params[:social_provider].blank? || params[:social_user_name].blank?
 
       if @user.re_requested_at.present?
         days = (Date.today - @user.re_requested_at.to_date).to_i
@@ -296,7 +296,10 @@ module Api::V1
       @user.update_attributes(
         creator_verified: false,
         re_requested_at: Time.now,
-        user_type: 'artist'
+        user_type: 'artist',
+        social_provider: params[:social_provider][:title],
+        social_user_name: params[:social_user_name],
+        request_status: User.request_statuses[:pending]
       )
       render json: @user,
         serializer: UserSerializer,

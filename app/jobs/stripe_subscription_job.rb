@@ -55,26 +55,26 @@ class StripeSubscriptionJob < ApplicationJob
   end
 
   def delete_user_content(user)
-    s3 ||= Aws::S3::Resource.new(region: ENV['AWS_REGION'],
-      access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-      secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
-    )
-    bucket = s3.bucket(ENV['AWS_S3_BUCKET'])
+    # s3 ||= Aws::S3::Resource.new(region: ENV['AWS_REGION'],
+    #   access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+    #   secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
+    # )
+    # bucket = s3.bucket(ENV['AWS_S3_BUCKET'])
 
-    tracks = Track.where(user_id: user.id)
-    aws_content = []
-    tracks.each do |track|
-      if track.audio.url.present?
-        aws_response = bucket.object(track.audio.path)
-        aws_content << { key: track.audio.path } if aws_response.exists?
-      end
-      destroy_mux_content(track.mux_audio_id_1) if track.mux_audio_id_1.present?
-    end
-    streams = Stream.where(user_id: user.id)
-    streams.each do |stream|
-      destroy_mux_content(stream.mp_channel_2_id) if stream.mp_channel_2_id.present?
-    end
-    destroy_aws_content(aws_content, bucket)
+    # tracks = Track.where(user_id: user.id)
+    # aws_content = []
+    # tracks.each do |track|
+    #   if track.audio.url.present?
+    #     aws_response = bucket.object(track.audio.path)
+    #     aws_content << { key: track.audio.path } if aws_response.exists?
+    #   end
+    #   destroy_mux_content(track.mux_audio_id_1) if track.mux_audio_id_1.present?
+    # end
+    # streams = Stream.where(user_id: user.id)
+    # streams.each do |stream|
+    #   destroy_mux_content(stream.mp_channel_2_id) if stream.mp_channel_2_id.present?
+    # end
+    # destroy_aws_content(aws_content, bucket)
   end
 
   def destroy_aws_content(content, bucket)
