@@ -215,7 +215,7 @@ class ShopCart < ApplicationRecord
           sender: customer,
           receiver: merchant,
           sent_amount: total_cost,
-          received_amount: total_cost - app_fee,
+          received_amount: total_cost,  # seller get full payment without app fee deduction
           fee: app_fee,
           # shipping_cost: shipping,
           shipping_cost: 0,
