@@ -152,7 +152,8 @@ module Api::V2
                     user_type: "artist", plan: selectedPlan, creator_verified: false,
                     request_role: 'artist', request_status: User.request_statuses[:pending],
                     social_provider: params[:social_provider],
-                    social_user_name: params[:social_user_name]
+                    social_user_name: params[:social_user_name],
+                    re_requested_at: Time.now
                 )
                 message = "Your plan has been upgraded and you will be notified once your account will be verified. In the meanwhile, you will remain in your current plan"
                 ApplicationMailer.subscription_change_email(current_user, message).deliver_later
