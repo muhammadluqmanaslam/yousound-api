@@ -70,6 +70,7 @@ gem 'base_x'
 # cronjob
 gem 'sidekiq'
 gem 'sidekiq-unique-jobs'
+gem "sidekiq-cron"
 gem 'clockwork', github: 'Rykian/clockwork'
 
 # relate to model
