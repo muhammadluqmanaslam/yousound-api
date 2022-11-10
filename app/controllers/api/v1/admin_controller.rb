@@ -283,7 +283,8 @@ module Api::V1
           payment_account_id: nil,
           payment_account_type: nil,
           payment_publishable_key: nil,
-          payment_access_code: nil
+          payment_access_code: nil,
+          stripe_express_dashboard_link: nil
         )
       end
 

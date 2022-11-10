@@ -71,13 +71,20 @@ module Api::V1
 
       stripe_account = Stripe::Account.retrieve(result['stripe_user_id']) rescue {}
       render_error 'Stripe account is not accessible', :unprocessable_entity and return if stripe_account['id'].blank?
-
+      stripe_express_dashboard_link = ""
+      begin
+        login_link = Stripe::Account.create_login_link(result['stripe_user_id'])
+        stripe_express_dashboard_link = login_link.url
+      rescue => exception
+        Rails.logger.info("========= Exception in creating stripe express dashboar link: #{stripe_express_dashboard_link}")
+      end
       current_user.update_attributes(
         payment_provider: 'stripe',
         payment_account_id: result['stripe_user_id'],
         payment_account_type: 'standalone',
         payment_publishable_key: result['stripe_publishable_key'],
-        payment_access_code: result['access_token']
+        payment_access_code: result['access_token'],
+        stripe_express_dashboard_link: stripe_express_dashboard_link
       )
 
       render json: current_user,
