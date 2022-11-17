@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
   get '/albums/:album_id/download_as_zip', to: 'web#download_as_zip'
 
+  post '/webhook_payment_intent', to: 'webhook#payment_process'
   scope module: 'api', format: false, constraints: { id: %r{[^/]+} } do
     namespace :v2 do
       resources :genres do

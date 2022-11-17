@@ -188,7 +188,8 @@ module Api::V2
 
         def stripe_subscription(stripe_customer_id, plan)
             if current_user.stripe_subscription_id.present?
-                if current_user.deactivate_subscription
+                previous_subscription = Stripe::Subscription.retrieve(current_user.stripe_subscription_id)
+                if previous_subscription.status == 'canceled'
                     subscription = Stripe::Subscription.create({
                         customer: stripe_customer_id,
                         items: [ { price: plan }, ],

@@ -31,6 +31,7 @@ gem 'rack-attack'
 gem 'jwt'
 
 gem 'stripe'
+gem 'stripe_event'
 # gem 'twitter'
 # user authenticate
 gem 'devise'

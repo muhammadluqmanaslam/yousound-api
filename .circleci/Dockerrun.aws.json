@@ -285,6 +285,10 @@
         {
           "name": "TWILIO_AUTH_TOKEN",
           "value": "<TWILIO_AUTH_TOKEN>"
+        },
+        {
+          "name": "SIGNING_SECRET",
+          "value": "<SIGNING_SECRET>"
         }
       ],
       "mountPoints": [
