@@ -170,6 +170,7 @@ module Api::V1
     def approve_user
       render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
       user = User.find(params[:user_id])
+      render_error 'User payment method is missing.', :unprocessable_entity and return if user.stripe_customer_id.blank?
       if user.stripe_subscription_id.present? && user.creator_verified == false
         subscription = stripe_subscription_change(user)
         return if subscription.id.blank?

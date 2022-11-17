@@ -13,24 +13,16 @@ class StripeSubscriptionWorker
 				if (Time.at(stripe_subscription.current_period_end) == user.trial_end)
 					trial_end = user.trial_end < Date.today
 					if trial_end
-						user.update(creator_verified: false) if user.stripe_subscription_id.present? && user.plan != 'basic'
-						if user.trial_end > Time.new - 38.days
+						user.stripe_subscription_id.present? && user.plan != 'basic' ? user.update(creator_verified: false, plan: nil) : user.update(plan: nil)
+						if (Date.today - user.trial_end.to_date).to_i == 38
 							send_cancellation_email(user)
-						elsif user.trial_end > Time.new - 45.days
+						elsif (Date.today- user.trial_end.to_date).to_i == 45
 							delete_user_content(user)
 						end
 					end
-				else
-					puts "--------------------user update id---------#{user.id}"
-					if(stripe_subscription.current_period_end != stripe_subscription.trial_end)
-						# subscription updated.
-						user.update(trial_start: Time.at(stripe_subscription.current_period_start),
-							trial_end: Time.at(stripe_subscription.current_period_end)
-						)
-						stripe_funds_transfer
-					end
 				end
 			rescue => ex
+				puts "==============Error #{ex}"
 				Rails.logger.info("==============Error #{ex}")
 			end
 		end
@@ -38,25 +30,9 @@ class StripeSubscriptionWorker
 
 	private
 
-	def stripe_funds_transfer(user)
-		share_payouts = Tracking.most_listened_creators(user).first(10)
-		user_ids = share_payouts.pluck(:id)
-		share_payouts.each do |record|
-			user = User.find(record[:id])
-			stripe_fee = Payment.stripe_fee(record[:subscriptionShare] * 100)
-			transfer_amount = (record[:subscriptionShare] * 100 - stripe_fee).to_i
-			if (user.stripe_connected && transfer_amount > 0)
-				Stripe::Transfer.create({
-					amount: transfer_amount,
-					currency: 'usd',
-					destination: user.payment_account_id,
-				})
-			end
-		end
-	end
 
 	def send_cancellation_email(user)
-		# ApplicationMailer.cancellation_email_template(user).deliver
+		ApplicationMailer.cancellation_email_template(user).deliver
 	end
 
 	def delete_user_content(user)

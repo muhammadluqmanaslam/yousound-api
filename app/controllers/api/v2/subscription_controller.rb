@@ -32,10 +32,10 @@ module Api::V2
                 })
                 if current_user.stripe_customer_id == nil
                     payment_method = Stripe::PaymentMethod.create({
-                    type: 'card',
-                    card: {
-                        token: params[:token_id]
-                    },
+                        type: 'card',
+                        card: {
+                            token: params[:token_id]
+                        },
                     })
                     StripeResponse.create({
                         user_id: current_user.id,
@@ -79,7 +79,7 @@ module Api::V2
                     elsif current_user.user_type != "listener" && current_user.creator_verified == false &&
                             current_user.trial_end.present? && current_user.stripe_subscription_id.present?
                         # creator resubscribing again.
-                        current_user.update(creator_verified: true)
+                        current_user.update(creator_verified: true, plan: params[:price_id])
                         subscription = stripe_subscription(current_user.stripe_customer_id, price_param)
                     elsif current_user.user_type == "listener" && price_param == "basic" &&
                             (current_user.plan.nil? || current_user.plan == "basic")
@@ -187,10 +187,24 @@ module Api::V2
         private
 
         def stripe_subscription(stripe_customer_id, plan)
-            subscription = Stripe::Subscription.create({
-                customer: stripe_customer_id, items: [ { price: plan }, ],
-                trial_period_days: 30
-            })
+            if current_user.stripe_subscription_id.present?
+                if current_user.deactivate_subscription
+                    subscription = Stripe::Subscription.create({
+                        customer: stripe_customer_id,
+                        items: [ { price: plan }, ],
+                        trial_end: (Time.now + 30.seconds).to_i
+                    })
+                else
+                    subscription = Stripe::Subscription.update(
+                        current_user.stripe_subscription_id, {trial_end: 'now'}
+                    )
+                end
+            else
+                subscription = Stripe::Subscription.create({
+                    customer: stripe_customer_id, items: [ { price: plan }, ],
+                    trial_period_days: 30
+                })
+            end
         end
 
         def stripe_subscription_change(selectedPlan)
