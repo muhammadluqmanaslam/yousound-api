@@ -431,6 +431,7 @@ module Api::V1
           where[:trial_start][:not] = nil
           where[:trial_end] = {}
           where[:trial_end][:not] = nil
+          where[:trial_complete] = false
       end
       ps = {}
 

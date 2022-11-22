@@ -27,7 +27,7 @@ class WebhookController < ApplicationController
 						user = User.find_by_stripe_customer_id(event.data.object.customer)
 						stripe_subscription = Stripe::Subscription.retrieve(user.stripe_subscription_id)
 						user.update(trial_start: Time.at(stripe_subscription.current_period_start),
-							trial_end: Time.at(stripe_subscription.current_period_end)
+							trial_end: Time.at(stripe_subscription.current_period_end, trial_complete: true)
 						)
 						# stripe_funds_transfer(user)
 						status 200

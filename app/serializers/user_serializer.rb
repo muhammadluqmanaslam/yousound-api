@@ -2,7 +2,7 @@ class UserSerializer < ActiveModel::Serializer
   attributes :id, :slug, :username, :display_name, :first_name, :last_name, :contact_url, :user_type,
     :avatar, :repost_price, :repost_price_end_at, :max_repost_price, :trial_start, :re_requested_at,
     :status, :size_chart, :shipping_policy, :return_policy, :privacy_policy, :free_trial_time, :trial_end,
-    :stripe_express_dashboard_link
+    :stripe_express_dashboard_link, :trial_complete
   attribute :followers
   attribute :followings
   attribute :email, if: :include_social_info?

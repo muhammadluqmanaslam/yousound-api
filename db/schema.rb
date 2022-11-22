@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20221110103438) do
+ActiveRecord::Schema.define(version: 20221122133759) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -790,6 +790,7 @@ ActiveRecord::Schema.define(version: 20221110103438) do
     t.boolean  "deactivate_subscription",          default: false
     t.datetime "re_requested_at"
     t.string   "stripe_express_dashboard_link"
+    t.boolean  "trial_complete",                   default: false
     t.index ["approver_id"], name: "index_users_on_approver_id", using: :btree
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
