@@ -30,15 +30,14 @@ class WebhookController < ApplicationController
 							trial_end: Time.at(stripe_subscription.current_period_end, trial_complete: true)
 						)
 						# stripe_funds_transfer(user)
-						status 200
+						return 200
 					end
 				end
 			end
 		rescue => e
 			# Invalid payload
 			puts "⚠️  Webhook error while parsing basic request. #{e.message}"
-			status 400
-			return
+			return 400
 		end
 	end
 
