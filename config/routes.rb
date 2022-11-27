@@ -365,6 +365,9 @@ Rails.application.routes.draw do
         member do
           get :similars
         end
+        collection do
+          get :spotlight_video_available
+        end
       end
 
       namespace :shopping do
