@@ -6,8 +6,8 @@ module Api::V1
       :can_view, :pay_view, :view, :watching, :pay_attachment,
       :similars
     ]
-    skip_before_action :authenticate_token!, only: :public_user_streams
-    skip_after_action :verify_authorized, only: :public_user_streams
+    skip_before_action :authenticate_token!, only: [:public_user_streams, :spotlight_video]
+    skip_after_action :verify_authorized, only: [:public_user_streams, :spotlight_video]
     # skip_after_action :verify_policy_scoped
 
     swagger_controller :streams, 'stream'
@@ -83,6 +83,18 @@ module Api::V1
       render json: @stream,
         serializer: StreamSerializer,
         scope: OpenStruct.new(current_user: current_user)
+    end
+
+    def spotlight_video
+      @stream = Stream.find_by(user_id: params[:user_id], spotlight_video: true)
+      if @stream
+
+        render json: @stream,
+          serializer: StreamSerializer,
+          scope: OpenStruct.new(current_user: current_user)
+      else
+        render json: false, status: :unprocessable_entity
+      end
     end
 
 

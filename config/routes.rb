@@ -358,6 +358,7 @@ Rails.application.routes.draw do
         end
         collection do
           get :public_user_streams
+          get :spotlight_video
         end
       end
 
