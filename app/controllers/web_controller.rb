@@ -85,6 +85,7 @@ class WebController < ApplicationController
 
         if (asset_type == "video")
           stream = Stream.find_by(mp_channel_1_id: asset_id)
+          convert_support_into_standard_format(asset_id) if stream.spotlight_video
           if (stream && stream.uploading?)
             playback1_id = request['data']['playback_ids'][0]['id'] rescue ''
             playback2_id = request['data']['playback_ids'][1]['id'] rescue ''
