@@ -62,7 +62,7 @@ module Api::V1
       only_follows = params[:only_follows].present? ? ActiveModel::Type::Boolean.new.cast(params[:only_follows]) : false
       genre_id = params[:genre_id].to_i rescue 0
 
-      streams = Stream.order('created_at desc').page(page).per(per_page)
+      streams = Stream.where(spotlight_video: false).order('created_at desc').page(page).per(per_page)
       genres = Genre.where(id: streams.pluck(:genre_id)).pluck(:name)
       render_success(
         streams: ActiveModel::SerializableResource.new(
