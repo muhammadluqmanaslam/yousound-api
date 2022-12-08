@@ -197,7 +197,8 @@ class UserPolicy < ApplicationPolicy
       :age_group,
       :social_provider,
       :social_url,
-      :user_type
+      :user_type,
+      :initial_signup_type
     ]
 
     # if user.present? && user.admin?

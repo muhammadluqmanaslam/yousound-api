@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20221123110302) do
+ActiveRecord::Schema.define(version: 20221208071848) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -63,6 +63,9 @@ ActiveRecord::Schema.define(version: 20221123110302) do
     t.string   "status"
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
+    t.integer  "bpm"
+    t.string   "bpm_key"
+    t.string   "bpm_value"
     t.index ["slug"], name: "index_albums_on_slug", unique: true, using: :btree
     t.index ["user_id"], name: "index_albums_on_user_id", using: :btree
   end
@@ -107,6 +110,21 @@ ActiveRecord::Schema.define(version: 20221123110302) do
     t.index ["invitation_token"], name: "index_attendees_on_invitation_token", unique: true, using: :btree
     t.index ["referrer_id"], name: "index_attendees_on_referrer_id", using: :btree
     t.index ["user_id"], name: "index_attendees_on_user_id", using: :btree
+  end
+
+  create_table "collections", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "album_id"
+    t.integer  "track_id"
+    t.integer  "stream_id"
+    t.integer  "shop_product_id"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.index ["album_id"], name: "index_collections_on_album_id", using: :btree
+    t.index ["shop_product_id"], name: "index_collections_on_shop_product_id", using: :btree
+    t.index ["stream_id"], name: "index_collections_on_stream_id", using: :btree
+    t.index ["track_id"], name: "index_collections_on_track_id", using: :btree
+    t.index ["user_id"], name: "index_collections_on_user_id", using: :btree
   end
 
   create_table "comments", force: :cascade do |t|
@@ -265,6 +283,29 @@ ActiveRecord::Schema.define(version: 20221123110302) do
     t.index ["order_id"], name: "index_payments_on_order_id", using: :btree
     t.index ["receiver_id"], name: "index_payments_on_receiver_id", using: :btree
     t.index ["sender_id"], name: "index_payments_on_sender_id", using: :btree
+  end
+
+  create_table "playlist_details", force: :cascade do |t|
+    t.integer  "playlist_id"
+    t.integer  "track_id"
+    t.integer  "stream_id"
+    t.integer  "shop_product_id"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.index ["playlist_id"], name: "index_playlist_details_on_playlist_id", using: :btree
+    t.index ["shop_product_id"], name: "index_playlist_details_on_shop_product_id", using: :btree
+    t.index ["stream_id"], name: "index_playlist_details_on_stream_id", using: :btree
+    t.index ["track_id"], name: "index_playlist_details_on_track_id", using: :btree
+  end
+
+  create_table "playlists", force: :cascade do |t|
+    t.string   "name"
+    t.boolean  "playlist_public"
+    t.integer  "user_id"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
+    t.string   "playlist_type"
+    t.index ["user_id"], name: "index_playlists_on_user_id", using: :btree
   end
 
   create_table "posts", force: :cascade do |t|
@@ -672,6 +713,7 @@ ActiveRecord::Schema.define(version: 20221123110302) do
     t.string   "mp_channel_1_ep_1_url"
     t.string   "mp_channel_2_ep_1_id"
     t.string   "mp_channel_2_ep_1_url"
+    t.float    "duration"
     t.index ["album_id"], name: "index_tracks_on_album_id", using: :btree
     t.index ["slug"], name: "index_tracks_on_slug", unique: true, using: :btree
     t.index ["user_id"], name: "index_tracks_on_user_id", using: :btree
@@ -792,6 +834,7 @@ ActiveRecord::Schema.define(version: 20221123110302) do
     t.datetime "re_requested_at"
     t.string   "stripe_express_dashboard_link"
     t.boolean  "trial_complete",                   default: false
+    t.string   "initial_signup_type"
     t.index ["approver_id"], name: "index_users_on_approver_id", using: :btree
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
     t.index ["email"], name: "index_users_on_email", unique: true, using: :btree

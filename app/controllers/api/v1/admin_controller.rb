@@ -388,7 +388,7 @@ module Api::V1
       per_page = (params[:per_page] || 25).to_i
       q = params[:q] || '*'
 
-      filters = ['artists', 'brands', 'listeners', 'trial', 'cancelled', 'free_credit']
+      filters = ['artists', 'brands', 'listeners', 'trial', 'cancelled', 'free_credit', 'trial_drop_off']
       tabs_count = {}
       users = nil
 
@@ -430,6 +430,18 @@ module Api::V1
             where[:user_type][:not] = ['superadmin', 'admin']
             where[:status] = User.statuses[:active]
             where[:deactivate_subscription] = false
+            where[:stripe_subscription_id] = {}
+            where[:stripe_subscription_id][:not] = nil
+            where[:trial_start] = {}
+            where[:trial_start][:not] = nil
+            where[:trial_end] = {}
+            where[:trial_end][:not] = nil
+            where[:trial_complete] = false
+          when 'trial_drop_off'
+            where[:user_type] = {}
+            where[:user_type][:not] = ['superadmin', 'admin']
+            where[:status] = User.statuses[:active]
+            where[:deactivate_subscription] = true
             where[:stripe_subscription_id] = {}
             where[:stripe_subscription_id][:not] = nil
             where[:trial_start] = {}
