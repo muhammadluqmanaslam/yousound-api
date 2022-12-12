@@ -30,12 +30,15 @@ class Tracking < ApplicationRecord
     played_count = played_count.sort {|a1,a2| a2[1]<=>a1[1]}.to_h #Most listened artists stayed on top
     play = []
     played_count.keys.each do |creator_id|
-      username = trackings.select { |t| t.creator_id == creator_id}&.first&.creator&.username
+      creator = trackings.select { |t| t.creator_id == creator_id}&.first&.creator
       play.push(
-        user: username,
+        user: creator&.username,
         playedViewed: played_count[creator_id],
         subscriptionShare: share_calculate(played_count),
-        id: creator_id
+        id: creator_id,
+        user_type: creator&.user_type,
+        display_name: creator&.display_name,
+        avatar_url: creator.avatar.thumb.url
       )
     end
 
