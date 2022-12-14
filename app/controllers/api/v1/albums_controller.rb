@@ -591,6 +591,7 @@ module Api::V1
     def repost
       authorize @album rescue render_error "You can't repost your own album", :unprocessable_entity and return
       @album.repost(current_user)
+      @collection = Collection.create(track_id: params[:track_id], user_id: current_user.id) if params[:track_id].present?
       render_success(true)
     end
 

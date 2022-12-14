@@ -105,6 +105,8 @@ class ShopProduct < ApplicationRecord
   has_many :covers, -> { order(position: :asc) }, foreign_key: 'product_id', class_name: 'ShopProductCover', dependent: :destroy
   has_many :items, foreign_key: 'product_id', class_name: 'ShopItem', dependent: :destroy
   has_many :comments, as: :commentable, dependent: :destroy
+  has_many :collections, dependent: :destroy
+  has_many :playlist_details, dependent: :destroy
 
   accepts_nested_attributes_for :variants
   accepts_nested_attributes_for :shipments

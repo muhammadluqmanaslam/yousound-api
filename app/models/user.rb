@@ -106,6 +106,8 @@ class User < ApplicationRecord
 
   has_many :addresses, foreign_key: 'customer_id', class_name: 'ShopAddress'
   belongs_to :default_address, foreign_key: 'address_id', class_name: 'ShopAddress'
+  has_many :collections, dependent: :destroy
+  has_many :playlists, dependent: :destroy
 
   # default
   after_initialize :set_default_values

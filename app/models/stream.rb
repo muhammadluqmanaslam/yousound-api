@@ -42,6 +42,9 @@ class Stream < ApplicationRecord
   has_many :user_streams, dependent: :destroy
   has_many :comments, as: :commentable, dependent: :destroy
 
+  has_many :collections, dependent: :destroy
+  has_many :playlist_details, dependent: :destroy
+
   # default
   after_initialize :set_default_values
   def set_default_values

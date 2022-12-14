@@ -431,6 +431,7 @@ module Api::V1::Shopping
     def repost
       authorize @product rescue render_error "You can't repost your own product", :unprocessable_entity and return
       @product.repost(current_user, params[:page_track])
+      @collection = Collection.create(shop_product_id: params[:id], user_id: current_user.id) if params[:id].present?
       render_success(true)
     end
 

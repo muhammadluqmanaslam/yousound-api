@@ -138,6 +138,9 @@ class AlbumPolicy < ApplicationPolicy
       :enabled_sample,
       :released_at,
       :location,
+      :bpm,
+      :bpm_key,
+      :bpm_value
     ]
   end
 

@@ -47,6 +47,13 @@ Rails.application.routes.draw do
     end
 
     namespace :v1 do
+      resources :collections
+      resources :collection_playlists do
+        collection do
+          get :fetch_playlist_details
+        end
+      end
+
       resources :settings, only: [:index, :create]
 
       resources :twitter, only: [] do

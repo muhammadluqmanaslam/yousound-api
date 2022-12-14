@@ -19,6 +19,7 @@ gem 'redis', '~> 3.0'
 
 # gem 'newrelic_rpm'
 gem "sentry-raven"
+gem 'activerecord-import'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development

@@ -82,6 +82,7 @@ class WebController < ApplicationController
       when 'video.asset.ready'
         asset_id = request['data']['id']
         asset_type = request['data']['tracks'][0]['type'] rescue ''
+        duration = request['data']['tracks'][0]['duration'] rescue ''
 
         if (asset_type == "video")
           stream = Stream.find_by(mp_channel_1_id: asset_id)
@@ -111,7 +112,8 @@ class WebController < ApplicationController
               mp_channel_2_ep_1_id: playback2_id,
               mp_channel_2_ep_1_url: playback2_id.blank? ? '' : "https://stream.mux.com/#{playback2_id}/audio.m4a",
               audio: playback1_id.blank? ? '' : "https://stream.mux.com/#{playback1_id}/audio.m4a",
-              status: Track.statuses[:active]
+              status: Track.statuses[:active],
+              duration: duration
             )
 
             # track.notify

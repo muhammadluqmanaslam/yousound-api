@@ -1,4 +1,7 @@
 class Track < ApplicationRecord
+  has_many :collections, dependent: :destroy
+  has_many :playlist_details, dependent: :destroy
+
   # enum status: [ :inactive, :active ]
   enum status: {
     inactive: 'inactive',

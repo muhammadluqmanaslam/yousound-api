@@ -155,17 +155,28 @@ module Api::V1
             categories: categories
           )
         when 'recommended', 'popular', 'new'
-          albums = User.explore_query(q, filter, genre, {page: page, per_page: per_page}, current_user)
-          # genres = albums.map { |track| track.tags }.flatten.uniq.map { |tag| tag.name }.select { |tag_name| tag_name.start_with?('#') }.sort_by! { |genre| genre.downcase }
+          albums_new = User.explore_query(q, "new", genre, {page: page, per_page: per_page}, current_user)
+          albums_recommended = User.explore_query(q, "recommended", genre, {page: page, per_page: per_page}, current_user)
+          albums_popular = User.explore_query(q, "popular", genre, {page: page, per_page: per_page}, current_user)
 
-          render_success Panko::Response.new(
-            albums: Panko::ArraySerializer.new(
-              albums, {
-                each_serializer: AlbumSerializer1,
-                scope: OpenStruct.new(current_user: current_user)
-              }
+          # genres = albums.map { |track| track.tags }.flatten.uniq.map { |tag| tag.name }.select { |tag_name| tag_name.start_with?('#') }.sort_by! { |genre| genre.downcase }
+          render_success(
+            recommended: ActiveModelSerializers::SerializableResource.new(
+              albums_recommended,
+              each_serializer: AlbumSerializer,
+              scope: OpenStruct.new(current_user: current_user)
             ),
-            pagination: pagination(albums)
+            new: ActiveModelSerializers::SerializableResource.new(
+              albums_new,
+              each_serializer: AlbumSerializer,
+              scope: OpenStruct.new(current_user: current_user)
+            ),
+            popular: ActiveModelSerializers::SerializableResource.new(
+              albums_popular,
+              each_serializer: AlbumSerializer,
+              scope: OpenStruct.new(current_user: current_user)
+            ),
+            pagination: pagination(albums_recommended)
           )
         else
           seed = seed.to_s
@@ -265,17 +276,28 @@ module Api::V1
             categories: categories
           )
         when 'recommended', 'popular', 'new'
-          albums = User.explore_query(q, filter, genre, {page: page, per_page: per_page}, current_user)
+          albums_new = User.explore_query(q, "new", genre, {page: page, per_page: per_page}, current_user)
+          albums_recommended = User.explore_query(q, "recommended", genre, {page: page, per_page: per_page}, current_user)
+          albums_popular = User.explore_query(q, "popular", genre, {page: page, per_page: per_page}, current_user)
           # genres = albums.map { |track| track.tags }.flatten.uniq.map { |tag| tag.name }.select { |tag_name| tag_name.start_with?('#') }.sort_by! { |genre| genre.downcase }
 
-          render_success Panko::Response.new(
-            albums: Panko::ArraySerializer.new(
-              albums, {
-                each_serializer: AlbumSerializer1,
-                scope: OpenStruct.new(current_user: current_user)
-              }
+          render_success(
+            recommended: ActiveModelSerializers::SerializableResource.new(
+              albums_recommended,
+              each_serializer: AlbumSerializer,
+              scope: OpenStruct.new(current_user: current_user)
             ),
-            pagination: pagination(albums)
+            new: ActiveModelSerializers::SerializableResource.new(
+              albums_new,
+              each_serializer: AlbumSerializer,
+              scope: OpenStruct.new(current_user: current_user)
+            ),
+            popular: ActiveModelSerializers::SerializableResource.new(
+              albums_popular,
+              each_serializer: AlbumSerializer,
+              scope: OpenStruct.new(current_user: current_user)
+            ),
+            pagination: pagination(albums_recommended)
           )
         else
           seed = seed.to_s

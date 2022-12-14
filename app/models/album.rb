@@ -137,6 +137,7 @@ class Album < ApplicationRecord
   has_many :activities, as: :assoc, dependent: :destroy
   has_many :feeds, as: :assoc, dependent: :destroy
   has_many :samplings, foreign_key: 'sampling_album_id', class_name: 'Sampling'
+  has_many :collections, dependent: :destroy
 
   accepts_nested_attributes_for :album_tracks#, :album_genres
 
