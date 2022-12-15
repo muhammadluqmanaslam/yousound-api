@@ -1007,13 +1007,13 @@ module Api::V1
 		end
 
     def create_collection
-      if params[:album_id].present?
-        track_ids = Album.find(params[:album_id]).tracks.pluck(:id)
+      if params[:track_id].present?
+        @collection = Collection.create(track_id: params[:track_id], user_id: current_user.id) if params[:track_id].present?
+      elsif params[:id].present?
+        track_ids = Album.find(params[:id]).tracks.pluck(:id)
         collections = []
         collections << (track_ids.map{ |t| Collection.new(track_id: t, user_id: current_user.id) })
         Collection.import(collections.flatten)
-      elsif params[:track_id].present?
-        @collection = Collection.create(track_id: params[:track_id], user_id: current_user.id) if params[:track_id].present?
       end
     end
   end
