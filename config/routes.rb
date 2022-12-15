@@ -396,6 +396,7 @@ Rails.application.routes.draw do
             get :deny_collaboration
             get :ordered_items
             get :tickets
+            get :add_to_collection
           end
 
           resources :activities, controller: 'products/activities', only: [:index] do

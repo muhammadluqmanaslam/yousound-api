@@ -590,9 +590,9 @@ module Api::V1
       param :path, :id, :string, :required
     end
     def repost
-      authorize @album rescue render_error "You can't repost your own album", :unprocessable_entity and return
+      create_collection
+      authorize @album rescue render_error "You can't repost your own album but you have successfully added tracks in your collection.", :unprocessable_entity and return
       @album.repost(current_user)
-      @collection = Collection.create(track_id: params[:track_id], user_id: current_user.id) if params[:track_id].present?
       render_success(true)
     end
 
@@ -1005,5 +1005,16 @@ module Api::V1
 				@album.gradient_color = '#3d1403'
 			end
 		end
+
+    def create_collection
+      if params[:album_id].present?
+        track_ids = Album.find(params[:album_id]).tracks.pluck(:id)
+        collections = []
+        collections << (track_ids.map{ |t| Collection.new(track_id: t, user_id: current_user.id) })
+        Collection.import(collections.flatten)
+      elsif params[:track_id].present?
+        @collection = Collection.create(track_id: params[:track_id], user_id: current_user.id) if params[:track_id].present?
+      end
+    end
   end
 end

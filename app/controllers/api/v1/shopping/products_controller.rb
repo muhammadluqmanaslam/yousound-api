@@ -3,7 +3,7 @@ module Api::V1::Shopping
     before_action :set_product, only: [
       :show, :update, :destroy, :release, :repost, :hide,
       :accept_collaboration, :deny_collaboration,
-      :ordered_items, :tickets
+      :ordered_items, :tickets, :add_to_collection
     ]
     skip_before_action :authenticate_token!, only: [:show]
     before_action :authenticate_token, only: [:show]
@@ -431,10 +431,14 @@ module Api::V1::Shopping
     def repost
       authorize @product rescue render_error "You can't repost your own product", :unprocessable_entity and return
       @product.repost(current_user, params[:page_track])
-      @collection = Collection.create(shop_product_id: params[:id], user_id: current_user.id) if params[:id].present?
       render_success(true)
     end
 
+    def add_to_collection
+      authorize @product rescue render_error 'Product is not available', :unprocessable_entity and return if params[:id].present?
+      Collection.create(user_id: current_user.id, shop_product_id: @product.id)
+      render_success(true)
+    end
 
     setup_authorization_header(:unrepost)
     swagger_api :unrepost do |api|

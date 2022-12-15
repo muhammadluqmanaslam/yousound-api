@@ -17,6 +17,10 @@ class ShopProductPolicy < ApplicationPolicy
     true
   end
 
+  def add_to_collection?
+    true
+  end
+
   def update?
     user.admin? || record.merchant == user
   end
