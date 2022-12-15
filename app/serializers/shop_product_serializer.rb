@@ -1,6 +1,6 @@
 class ShopProductSerializer < ActiveModel::Serializer
   attributes :id, :name, :description, :price, :reposted, :stock, :sold, :stock_status, :collaborators_count,
-    :show_status, :tax_percent, :is_vat, :seller_location, :status, :created_at
+    :show_status, :tax_percent, :is_vat, :seller_location, :status, :created_at, :gradient_color
 
   attribute :collaborators, if: :include_collaborators?
   # attribute :creator, if: :include_collaborators?

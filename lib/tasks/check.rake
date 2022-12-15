@@ -112,4 +112,72 @@ namespace :db do
     end
     puts 'Assigned'
   end
+
+  desc 'Set origianl albums gradient colors'
+  task :fetch_hex_for_albums => :environment do
+
+    Album.all.each_with_index do |album, index|
+      begin
+        uri = URI(album.cover.url)
+        resp = Net::HTTP.get_response(uri)
+        this_file = "tempCover_#{index}.png"
+        if resp.body.include?('Error')
+          album.update(gradient_color: "#3d1403")
+          next
+        end
+        f = File.open(this_file, 'wb+'){|f| f.write(resp.body)}
+        image = MiniMagick::Image.open(this_file)
+        result = image.run_command('convert', this_file, '-format', '%c', '-colors', 1, '-depth', 8, 'histogram:info:')
+      
+        # Extract colors and frequencies from result
+        frequencies = result.scan(/([0-9]+)\:/).flatten.map { |m| m.to_f }
+        hex_values = result.scan(/(\#[0-9ABCDEF]{6,8})/).flatten
+        if hex_values.present?
+          album.update(gradient_color: hex_values.first)
+          File.delete(this_file) if File.exist?(this_file)
+          puts " ========== gradient color #{album.gradient_color}"
+        else
+          album.update(gradient_color: "#3d1403")
+        end
+        # this_file.
+      rescue => e
+        puts "Exce: #{e}"
+        album.update(gradient_color: "#3d1403")
+      end
+    end
+  end
+
+  desc 'Set origianl product gradient colors'
+  task :fetch_hex_for_products => :environment do
+
+    ShopProduct.all.each_with_index do |product, index|
+      begin
+        uri = URI(product.covers.first.cover.url)
+        resp = Net::HTTP.get_response(uri)
+        this_file = "tempCover_#{index}.png"
+        if resp.body.include?('Error')
+          product.update(gradient_color: "#3d1403")
+          next
+        end
+        f = File.open(this_file, 'wb+'){|f| f.write(resp.body)}
+        image = MiniMagick::Image.open(this_file)
+        result = image.run_command('convert', this_file, '-format', '%c', '-colors', 1, '-depth', 8, 'histogram:info:')
+      
+        # Extract colors and frequencies from result
+        frequencies = result.scan(/([0-9]+)\:/).flatten.map { |m| m.to_f }
+        hex_values = result.scan(/(\#[0-9ABCDEF]{6,8})/).flatten
+        if hex_values.present?
+          product.update(gradient_color: hex_values.first)
+          File.delete(this_file) if File.exist?(this_file)
+          puts " ========== gradient color #{product.gradient_color}"
+        else
+          product.update(gradient_color: "#3d1403")
+        end
+        # this_file.
+      rescue => e
+        puts "Exce: #{e}"
+        product.update(gradient_color: "#3d1403")
+      end
+    end
+  end
 end

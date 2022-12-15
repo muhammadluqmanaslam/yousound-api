@@ -172,6 +172,7 @@ module Api::V1
       track_ids = params[:album][:track_ids].present? ? params[:album][:track_ids].split(',') : []
       album_attributes[:album_tracks_attributes] = params[:album][:track_ids].split(',').map.with_index(0) {|x, i| {track_id: x, position: i}} if track_ids.size > 0
       @album.attributes = album_attributes
+			choose_hex_color
       if params[:album][:genre_ids].present?
         genre_ids = params[:album][:genre_ids].split(',').compact
         # @album.genre_list = Genre.where(id: genre_ids).pluck(:name)
@@ -984,5 +985,25 @@ module Api::V1
       @album = Album.includes(:user, :tracks).find_by_slug(params[:id]) || Album.includes(:user, :tracks).find(params[:id])
       # @album = current_user.albums.includes(:user).find(params[:id])
     end
+
+		def choose_hex_color
+			begin
+				file_path = params["album"]["cover"].tempfile.path
+				image = MiniMagick::Image.open(file_path)
+        result = image.run_command('convert', file_path, '-format', '%c', '-colors', 1, '-depth', 8, 'histogram:info:')
+      
+        # Extract colors and frequencies from result
+        frequencies = result.scan(/([0-9]+)\:/).flatten.map { |m| m.to_f }
+        hex_values = result.scan(/(\#[0-9ABCDEF]{6,8})/).flatten
+        if hex_values.present?
+          @album.update(gradient_color: hex_values.first)
+          puts " ========== gradient color #{album.gradient_color}"
+        else
+          @album.update(gradient_color: "#3d1403")
+        end
+			rescue
+				@album.gradient_color = '#3d1403'
+			end
+		end
   end
 end

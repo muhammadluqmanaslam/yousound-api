@@ -3,7 +3,7 @@ class AlbumSerializer < ActiveModel::Serializer
     :collaborators_count, :status, :genres, :is_only_for_live_stream,
     :is_content_acapella, :is_content_instrumental, :is_content_stems, :is_content_remix, :is_content_dj_mix,
     :recommended, :played, :downloaded, :reposted, :commented, :enabled_sample,
-    :created_at, :released_at, :recommended_at, :location
+    :created_at, :released_at, :recommended_at, :location, :gradient_color
   attributes :tracks
   attribute :products, if: :include_product?
   attribute :collaborators, if: :include_collaborators?

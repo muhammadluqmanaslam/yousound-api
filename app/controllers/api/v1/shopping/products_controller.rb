@@ -148,7 +148,7 @@ module Api::V1::Shopping
       @product.covers.third.position = 2
       @product.covers.third.cover = params[:shop_product][:cover3]
       @product.attributes = product_attributes
-
+      choose_hex_color
       @product.digital_content = params[:shop_product][:digital_content]
 
       collaborators_count = 0
@@ -591,5 +591,25 @@ module Api::V1::Shopping
     def set_product
       @product = ShopProduct.includes(:merchant, :category, :variants, :shipments, :covers, :user_products).find(params[:id])
     end
+
+    def choose_hex_color
+			begin
+				file_path = params["shop_product"]["cover1"].tempfile.path
+				image = MiniMagick::Image.open(file_path)
+        result = image.run_command('convert', file_path, '-format', '%c', '-colors', 1, '-depth', 8, 'histogram:info:')
+      
+        # Extract colors and frequencies from result
+        frequencies = result.scan(/([0-9]+)\:/).flatten.map { |m| m.to_f }
+        hex_values = result.scan(/(\#[0-9ABCDEF]{6,8})/).flatten
+        if hex_values.present?
+          @product.update(gradient_color: hex_values.first)
+          puts " ========== gradient color #{album.gradient_color}"
+        else
+          @product.update(gradient_color: "#3d1403")
+        end
+			rescue
+				@product.gradient_color = '#3d1403'
+			end
+		end
   end
 end

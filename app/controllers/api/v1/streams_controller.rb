@@ -432,9 +432,9 @@ module Api::V1
       param :path, :id, :string, :required
     end
     def repost
-      authorize @stream rescue render_error "You can't repost your own live video", :unprocessable_entity and return
+      @collection = Collection.create(stream_id: @stream.id, user_id: current_user.id)
+      authorize @stream rescue render_error "You can't repost your own live video but its added in your collections", :unprocessable_entity and return
       @stream.repost(current_user)
-      @collection = Collection.create(stream_id: @stream.id)
       render_success(true)
     end
 
