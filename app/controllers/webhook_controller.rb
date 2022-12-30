@@ -26,8 +26,10 @@ class WebhookController < ApplicationController
 					if confirm_payment_intent['status'] == 'succeeded'
 						user = User.find_by_stripe_customer_id(event.data.object.customer)
 						stripe_subscription = Stripe::Subscription.retrieve(user.stripe_subscription_id)
+						plan = stripe_subscription.plan.id
 						user.update(trial_start: Time.at(stripe_subscription.current_period_start),
-							trial_end: Time.at(stripe_subscription.current_period_end, trial_complete: true)
+							trial_end: Time.at(stripe_subscription.current_period_end, trial_complete: true,
+							creator_verified: plan != 'basic' ? true : false, plan: plan)
 						)
 						# stripe_funds_transfer(user)
 						return 200

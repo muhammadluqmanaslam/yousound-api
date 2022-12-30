@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20221214122748) do
+ActiveRecord::Schema.define(version: 20221227143526) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,6 +66,10 @@ ActiveRecord::Schema.define(version: 20221214122748) do
     t.integer  "bpm"
     t.string   "bpm_key"
     t.string   "bpm_value"
+    t.string   "web_title"
+    t.string   "web_review"
+    t.string   "mobile_title"
+    t.string   "mobile_review"
     t.string   "gradient_color"
     t.index ["slug"], name: "index_albums_on_slug", unique: true, using: :btree
     t.index ["user_id"], name: "index_albums_on_user_id", using: :btree
@@ -621,6 +625,7 @@ ActiveRecord::Schema.define(version: 20221214122748) do
     t.string   "video_type",            default: "live"
     t.integer  "duration",              default: 0
     t.boolean  "spotlight_video",       default: false
+    t.integer  "show_attachment_at"
     t.index ["assoc_type", "assoc_id"], name: "index_streams_on_assoc_type_and_assoc_id", using: :btree
     t.index ["genre_id"], name: "index_streams_on_genre_id", using: :btree
     t.index ["id", "user_id"], name: "index_streams_on_id_and_user_id", using: :btree

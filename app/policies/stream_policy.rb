@@ -58,7 +58,8 @@ class StreamPolicy < ApplicationPolicy
       :viewers_limit,
       :view_price,
       :assoc_type,
-      :assoc_id
+      :assoc_id,
+      :show_attachment_at
     ]
   end
 end

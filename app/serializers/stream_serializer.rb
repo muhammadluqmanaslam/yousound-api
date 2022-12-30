@@ -3,7 +3,7 @@ class StreamSerializer < ActiveModel::Serializer
     :video_type, :status, :started_at, :stopped_at, :mp_channel_1_ep_1_url,
     :mp_channel_2_url, :duration, :mp_channel_1_ep_1_id,
     :valid_period, :remaining_seconds, :assoc_type, :account_ids, :digital_content_name,
-    :view_price, :viewers_limit, :notified
+    :view_price, :viewers_limit, :notified, :show_attachment_at
   attribute :assoc
   attribute :guests
   attribute :ml_input_id, if: :is_current_user?
