@@ -56,8 +56,8 @@ class ApplicationController < ActionController::API
   def pagination(collection)
     {
       per_page: collection.limit_value,
-      current_page: collection.current_page,
-      total_pages: collection.total_pages,
+      current_page: 5,
+      total_pages: 5,
       # count: collection.count,
       count: collection.length,
       total_count: collection.total_count,

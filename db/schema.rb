@@ -70,7 +70,10 @@ ActiveRecord::Schema.define(version: 20221227143526) do
     t.string   "web_review"
     t.string   "mobile_title"
     t.string   "mobile_review"
+<<<<<<< HEAD
     t.string   "gradient_color"
+=======
+>>>>>>> YS-85
     t.index ["slug"], name: "index_albums_on_slug", unique: true, using: :btree
     t.index ["user_id"], name: "index_albums_on_user_id", using: :btree
   end
