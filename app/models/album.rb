@@ -12,6 +12,9 @@ class Album < ApplicationRecord
     deleted: 'deleted'
   }
 
+	validates :mobile_title, :web_title, length: { maximum: 46 }, allow_blank: true
+	validates :mobile_review, :web_review, length: { maximum: 120 }, allow_blank: true
+
   enum album_type: [:album, :playlist]
 
   mount_uploader :cover, CoverUploader

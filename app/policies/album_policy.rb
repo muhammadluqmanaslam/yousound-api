@@ -144,6 +144,10 @@ class AlbumPolicy < ApplicationPolicy
     ]
   end
 
+  def update_title_and_review?
+    user.admin? || user.moderator?
+  end
+
   private
   def possess?
     user.admin? || record.user == user

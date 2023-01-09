@@ -243,6 +243,7 @@ Rails.application.routes.draw do
           post :add_tracks
           post :remove_tracks
           get :public
+          get :update_title_and_review
         end
 
         collection do
