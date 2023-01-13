@@ -178,7 +178,7 @@ class User < ApplicationRecord
 
   def hidden_genre_objects
     # Genre.where(name: self.genre_list)
-    Genre.where(id: self.genre_list)
+    Genre.where.not(id: self.genre_list)
   end
 
   def blocked_album_ids
@@ -220,7 +220,7 @@ class User < ApplicationRecord
     hidden_product_ids = ShopProduct.where(show_status: "show_only_stream").pluck(:id)
     exclude_product_ids.concat hidden_product_ids
     #is_only_for_live_stream
-    
+
     exclude_product_ids
   end
 

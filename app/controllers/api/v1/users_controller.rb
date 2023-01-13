@@ -173,7 +173,7 @@ module Api::V1
 
       if @user.update(attributes)
         Rails.logger.info("@user.id...")
-          # 
+          #
         Rails.logger.info(@user.id)
         Rails.logger.info("@current_user.id...")
         Rails.logger.info(current_user.id)
@@ -763,7 +763,7 @@ module Api::V1
         @user.save
       else
         # @user.genre_list = Genre.where(id: genre_ids).pluck(:name)
-        @user.genre_list = Genre.where(id: genre_ids).pluck(:id)
+        @user.genre_list = Genre.where.not(id: genre_ids).pluck(:id)
         @user.save
       end
       render_success true
@@ -1091,7 +1091,7 @@ module Api::V1
         Rails.logger.info(e.message)
         render_success(error: e.message)
       end
-      
+
     end
 
     def stream_uploaded_limit_available
@@ -1132,7 +1132,7 @@ module Api::V1
         # if @numbers.empty?
           @numbers = @client.api.available_phone_numbers('US').local.list()
         # end
-  
+
         # Purchase the number & set the application_sid for voice and sms, will
         # tell the number where to route calls/sms
         @number = @numbers.first.phone_number
@@ -1141,7 +1141,7 @@ module Api::V1
           voice_application_sid: ENV['TWILIO_APPLICATION_SID'],
           sms_application_sid: ENV['TWILIO_APPLICATION_SID']
         )
-  
+
         # Set the user.masked_phone_number
         user.masked_phone_number(@number)
         user.save
