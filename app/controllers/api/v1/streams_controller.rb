@@ -85,6 +85,10 @@ module Api::V1
         scope: OpenStruct.new(current_user: current_user)
     end
 
+    swagger_api :spotlight_video do |api|
+      summary 'get user spotlight video'
+      param :query, :user_id, :string, :required
+    end
     def spotlight_video
       @stream = Stream.find_by(user_id: params[:user_id], spotlight_video: true)
       if @stream

@@ -5,10 +5,10 @@ module Api::V1
       :request_repost, :repost, :unrepost, :accept_collaboration, :deny_collaboration,
       :send_label_request, :remove_label, :accept_label_request, :deny_label_request,
       :make_public, :make_private, :make_live_video_only, :recommend, :unrecommend,
-      :report, :hide, :download, :play, :rearrange, :add_tracks, :remove_tracks, :public, :update_title_and_review
+      :report, :hide, :download, :play, :rearrange, :add_tracks, :remove_tracks, :public
     ]
     skip_before_action :authenticate_token!, only: [:show, :my_role, :public]
-    before_action :authenticate_token, only: [:show, :my_role, :update_title_and_review]
+    before_action :authenticate_token, only: [:show, :my_role]
 
     swagger_controller :albums, 'album'
 
@@ -336,21 +336,6 @@ module Api::V1
         scope: OpenStruct.new(current_user: current_user),
         include_meta: false
     end
-
-    def update_title_and_review
-      render_error 'You are not authorized', :unprocessable_entity and return unless current_user.admin? || current_user.moderator?
-      authorize @album
-
-      if @album.update(web_title: params[:web_title], web_review: params[:web_review], mobile_title: params[:mobile_title], mobile_review: params[:mobile_review])
-        render json: @album,
-          serializer: AlbumSerializer,
-          scope: OpenStruct.new(current_user: current_user),
-          include_meta: false
-      else
-        render_error 'Something went wrong.', :unprocessable_entity
-      end
-    end
-
 
     setup_authorization_header(:update)
     swagger_api :update do |api|
@@ -864,11 +849,22 @@ module Api::V1
     swagger_api :recommend do |api|
       summary 'recommend an album'
       param :path, :id, :string, :required
+      param :query, :web_title, :string, :optional
+      param :query, :web_review, :string, :optional
+      param :query, :mobile_title, :string, :optional
+      param :query, :mobile_title, :string, :optional
     end
     def recommend
       authorize @album
       @album.recommend(current_user)
-      render_success(true)
+      if @album.update(web_title: params[:web_title], web_review: params[:web_review], mobile_title: params[:mobile_title], mobile_review: params[:mobile_review])
+        render json: @album,
+          serializer: AlbumSerializer,
+          scope: OpenStruct.new(current_user: current_user),
+          include_meta: false
+      else
+        render_error 'Something went wrong.', :unprocessable_entity
+      end
     end
 
 

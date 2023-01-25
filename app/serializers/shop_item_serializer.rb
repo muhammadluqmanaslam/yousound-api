@@ -1,6 +1,6 @@
 class ShopItemSerializer < ActiveModel::Serializer
   attributes  :id, :price, :quantity, :fee, :shipping_cost, :tax, :tax_percent, :is_vat, :status,
-              :tracking_site, :tracking_url, :tracking_number
+              :tracking_site, :tracking_url, :tracking_number, :created_at, :updated_at
 
   # belongs_to :product, class_name: 'ShopProduct'
   attribute :product

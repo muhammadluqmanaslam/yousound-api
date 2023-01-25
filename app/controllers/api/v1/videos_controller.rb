@@ -1,5 +1,7 @@
 module Api::V1
 	class VideosController < ApiController
+   swagger_controller :videos, 'Videos'
+
 		before_action :set_stream, only: [
 			:update, :destroy, :similars
 		]
@@ -21,7 +23,10 @@ module Api::V1
 			)
 		end
 
-		def spotlight_video_available()
+		swagger_api :spotlight_video_available do |api|
+      summary 'User has uploaded spotlight video or not'
+    end
+		def spotlight_video_available
 			spotlight_video = Stream.where(user_id: current_user.id, spotlight_video: true)
 			if spotlight_video.count > 0
 				render json: true, status: :ok
@@ -30,6 +35,21 @@ module Api::V1
 			end
 		end
 
+		swagger_api :create do |api|
+      summary 'create a stream'
+      param :form, 'stream[name]', :string, :required
+      param :form, 'stream[description]', :string, :optional
+      param :form, 'stream[genre_id]', :string, :required
+      param :form, 'stream[view_price]', :integer, :optional
+      param :form, 'stream[valid_period]', :integer, :optional
+      param :form, 'stream[viewers_limit]', :integer, :optional
+      param :form, 'stream[creator_recoup_cost]', :integer, :optional
+      param :form, 'stream[collaborators]', :string, :optional
+      param :form, 'stream[cover]', :File, :required
+      param :form, 'stream[digital_content]', :File, :optional
+      param :form, 'stream[digital_content_name]', :string, :optional
+      param :form, 'stream[spotlight_video]', :boolean, :optional
+    end
 		def create
 			# unless params[:stream][:video].instance_of? ActionDispatch::Http::UploadedFile
 			#   render_error 'Please attach a video file', :unprocessable_entity and return
