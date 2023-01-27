@@ -7,7 +7,7 @@ module Api::V1
     end
 
     def dashboard_stats
-      @play = Tracking.most_listened_creators(current_user)
+      @play = Tracking.most_listened_creators(current_user, false)
 
       render json: @play.first(10)
     end

@@ -5,10 +5,16 @@ class Tracking < ApplicationRecord
   belongs_to :stream
   belongs_to :track
 
-  def self.most_listened_creators(listener)
-    trackings =  Tracking.joins(:creator).includes(:creator)
-      .where("trackings.listener_id = ? and trackings.active = ? and
-        users.payment_account_id IS NOT NULL", listener.id, true)
+  def self.most_listened_creators(listener, stripe_connected=true)
+    if (stripe_connected)
+      trackings =  Tracking.joins(:creator).includes(:creator)
+        .where("trackings.listener_id = ? and trackings.active = ? and
+          users.payment_account_id IS NOT NULL", listener.id, true)
+    else
+      trackings =  Tracking.joins(:creator).includes(:creator)
+        .where("trackings.listener_id = ? and trackings.active = ?", listener.id, true)
+    end
+
     play = count_plays(trackings)
     playedViewed = play.pluck(:playedViewed)
     if playedViewed.first(10).uniq.length != playedViewed.first(10).length
