@@ -26,24 +26,26 @@ module Api::V1
       per_page = (params[:per_page] || 10).to_i
       only_follows = params[:only_follows].present? ? ActiveModel::Type::Boolean.new.cast(params[:only_follows]) : false
       genre_id = params[:genre_id].to_i rescue 0
+      if params[:user_id].present?
+        streams = Stream.where(user_id: params[:user_id])
+        streams = streams.order('created_at ASC').page(page).per(per_page)
+      else
+        streams = Stream
+          .joins("LEFT JOIN follows "\
+            "ON streams.user_id = follows.followable_id AND follows.blocked = false AND follows.follower_id = #{current_user.id}"
+          )
+          .where(
+            streams: {
+              status: [Stream.statuses[:running], Stream.statuses[:archived]],
+              notified: true
+            }
+          )
+        streams = streams.where("follows.follower_id = ?", current_user.id) if only_follows
 
-      streams = Stream
-        .joins("LEFT JOIN follows "\
-          "ON streams.user_id = follows.followable_id AND follows.blocked = false AND follows.follower_id = #{current_user.id}"
-        )
-        .where(
-          streams: {
-            status: [Stream.statuses[:running], Stream.statuses[:archived]],
-            notified: true
-          }
-        )
-      streams = streams.where("follows.follower_id = ?", current_user.id) if only_follows
-
+        streams = streams.where("streams.genre_id = ?", genre_id) if genre_id > 0
+        streams = streams.order('follows.created_at ASC').page(page).per(per_page)
+      end
       genres = Genre.where(id: streams.pluck(:genre_id)).pluck(:name)
-
-      streams = streams.where("streams.genre_id = ?", genre_id) if genre_id > 0
-      streams = streams.order('follows.created_at ASC').page(page).per(per_page)
-
       render_success(
         streams: ActiveModel::SerializableResource.new(
           streams,

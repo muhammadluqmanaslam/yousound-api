@@ -111,3 +111,4 @@ Things you may want to cover:
 - rename StreamsChannel to StreamViewersChannel
 - rename StreamCreatorsChannel to StreamChannel
 - require all channel name and data
+# yousound-api-v2
